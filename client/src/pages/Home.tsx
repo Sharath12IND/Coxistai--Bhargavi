@@ -108,13 +108,25 @@ const Home = () => {
   return (
     <main className="relative z-10 pt-20">
       {/* Hero Section */}
-      <section className="min-h-screen flex items-center justify-center px-4">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="min-h-screen flex items-center justify-center px-4 relative">
+        <div className="max-w-5xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
+            {/* Badge */}
+            <motion.div 
+              className="inline-flex items-center space-x-2 glassmorphism rounded-full px-4 py-2 mb-8"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1, duration: 0.6 }}
+            >
+              <Sparkles className="w-4 h-4 text-green-400" />
+              <span className="text-sm font-semibold text-green-400">Next-Generation AI Learning Platform</span>
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            </motion.div>
+
             <motion.h1 
               className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-green-500 bg-clip-text text-transparent"
               initial={{ scale: 0.9 }}
@@ -123,15 +135,51 @@ const Home = () => {
             >
               Coexist AI
             </motion.h1>
+            
             <motion.p 
-              className="text-xl md:text-2xl text-slate-400 mb-8 leading-relaxed"
+              className="text-xl md:text-2xl text-slate-300 mb-4 leading-relaxed font-medium"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.8 }}
             >
-              Your AI-powered education assistant that transforms learning through intelligent tutoring, note management, and collaborative study tools.
+              The Future of Personalized Education
             </motion.p>
+            
+            <motion.p 
+              className="text-lg md:text-xl text-slate-400 mb-8 leading-relaxed max-w-3xl mx-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.8 }}
+            >
+              Transform your learning journey with AI-powered tutoring, intelligent note management, 
+              collaborative study environments, and personalized educational tools designed to unlock your full potential.
+            </motion.p>
+
+            {/* Stats */}
+            <motion.div 
+              className="flex flex-wrap justify-center items-center gap-8 mb-10"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+            >
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-400">50K+</div>
+                <div className="text-sm text-slate-400">Active Students</div>
+              </div>
+              <div className="w-px h-8 bg-slate-600"></div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-400">98%</div>
+                <div className="text-sm text-slate-400">Success Rate</div>
+              </div>
+              <div className="w-px h-8 bg-slate-600"></div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-400">24/7</div>
+                <div className="text-sm text-slate-400">AI Support</div>
+              </div>
+            </motion.div>
+
             <motion.div
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.8 }}
@@ -144,9 +192,53 @@ const Home = () => {
                 Start Learning Today
                 <ArrowRight className="inline w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </GlassmorphismButton>
+              <button 
+                className="text-slate-400 hover:text-white transition-colors duration-300 px-6 py-3 font-semibold"
+                onClick={() => setLocation('/presentations')}
+              >
+                Watch Demo
+              </button>
+            </motion.div>
+
+            {/* Feature Highlights */}
+            <motion.div 
+              className="flex flex-wrap justify-center items-center gap-6 mt-12 text-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8, duration: 0.8 }}
+            >
+              <div className="flex items-center space-x-2 text-slate-400">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span>Voice & Image Recognition</span>
+              </div>
+              <div className="flex items-center space-x-2 text-slate-400">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span>Real-time Collaboration</span>
+              </div>
+              <div className="flex items-center space-x-2 text-slate-400">
+                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                <span>Smart Study Planning</span>
+              </div>
             </motion.div>
           </motion.div>
         </div>
+
+        {/* Floating Elements */}
+        <motion.div 
+          className="absolute top-1/4 left-10 w-20 h-20 glassmorphism rounded-full flex items-center justify-center"
+          animate={{ y: [0, -10, 0] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <NotebookPen className="w-8 h-8 text-blue-400" />
+        </motion.div>
+        
+        <motion.div 
+          className="absolute top-1/3 right-10 w-16 h-16 glassmorphism rounded-full flex items-center justify-center"
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        >
+          <GraduationCap className="w-6 h-6 text-green-400" />
+        </motion.div>
       </section>
 
       {/* Feature Previews */}
