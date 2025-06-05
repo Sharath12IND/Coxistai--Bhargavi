@@ -1,58 +1,129 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { NAVIGATION_ITEMS } from "@/lib/constants";
 
 const Navigation = () => {
   const [location, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   const isActive = (path: string) => location === path;
+  const isDropdownActive = (dropdown: readonly any[]) => dropdown.some(item => location === item.path);
 
   const handleNavigation = (path: string) => {
     setLocation(path);
     setMobileMenuOpen(false);
+    setActiveDropdown(null);
+  };
+
+  const handleDropdownToggle = (itemId: string) => {
+    setActiveDropdown(activeDropdown === itemId ? null : itemId);
   };
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 glassmorphism-strong">
+      <nav className="fixed top-0 left-0 right-0 z-50 glassmorphism-strong border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <motion.div 
-              className="flex items-center space-x-2 cursor-pointer"
+              className="flex items-center space-x-3 cursor-pointer"
               onClick={() => handleNavigation('/')}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg" />
-              <span className="text-xl font-bold">Coexist AI</span>
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-green-500 rounded-xl shadow-lg" />
+              <div>
+                <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent">Coexist AI</span>
+                <div className="text-xs text-slate-400">Learning Platform</div>
+              </div>
             </motion.div>
             
             {/* Desktop Navigation */}
-            <div className="hidden md:flex space-x-2">
+            <div className="hidden lg:flex items-center space-x-1">
               {NAVIGATION_ITEMS.map((item) => (
-                <motion.button
-                  key={item.id}
-                  className={`nav-link px-4 py-2 rounded-lg transition-all duration-300 ${
-                    isActive(item.path) ? 'active' : ''
-                  }`}
-                  onClick={() => handleNavigation(item.path)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {item.label}
-                </motion.button>
+                <div key={item.id} className="relative">
+                  {'dropdown' in item ? (
+                    <div 
+                      className="relative"
+                      onMouseEnter={() => setActiveDropdown(item.id)}
+                      onMouseLeave={() => setActiveDropdown(null)}
+                    >
+                      <motion.button
+                        className={`nav-link px-4 py-3 rounded-xl transition-all duration-300 flex items-center space-x-2 ${
+                          isDropdownActive(item.dropdown) ? 'active' : ''
+                        }`}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <span>{item.label}</span>
+                        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${
+                          activeDropdown === item.id ? 'rotate-180' : ''
+                        }`} />
+                      </motion.button>
+                      
+                      <AnimatePresence>
+                        {activeDropdown === item.id && (
+                          <motion.div
+                            className="absolute top-full left-0 mt-2 w-80 glassmorphism-strong rounded-xl border border-white/10 shadow-2xl overflow-hidden"
+                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <div className="p-2">
+                              {item.dropdown.map((dropdownItem) => (
+                                <motion.button
+                                  key={dropdownItem.id}
+                                  className={`w-full text-left p-4 rounded-lg transition-all duration-200 hover:bg-white/10 ${
+                                    isActive(dropdownItem.path) ? 'bg-blue-500/20 border border-blue-500/30' : ''
+                                  }`}
+                                  onClick={() => handleNavigation(dropdownItem.path)}
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                >
+                                  <div className="font-semibold text-white">{dropdownItem.label}</div>
+                                  <div className="text-sm text-slate-400 mt-1">{dropdownItem.description}</div>
+                                </motion.button>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  ) : (
+                    <motion.button
+                      className={`nav-link px-4 py-3 rounded-xl transition-all duration-300 ${
+                        'path' in item && isActive(item.path) ? 'active' : ''
+                      }`}
+                      onClick={() => 'path' in item && handleNavigation(item.path)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {item.label}
+                    </motion.button>
+                  )}
+                </div>
               ))}
+              
+              {/* CTA Button */}
+              <motion.button
+                className="ml-4 glassmorphism-button px-6 py-3 rounded-xl font-semibold"
+                onClick={() => handleNavigation('/chat')}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Get Started
+              </motion.button>
             </div>
             
             {/* Mobile Menu Button */}
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <motion.button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="text-white p-2"
+                className="text-white p-3 glassmorphism rounded-xl"
                 whileTap={{ scale: 0.95 }}
               >
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -62,28 +133,78 @@ const Navigation = () => {
         </div>
         
         {/* Mobile Menu */}
-        <motion.div
-          className={`md:hidden glassmorphism mt-2 mx-4 rounded-lg overflow-hidden ${
-            mobileMenuOpen ? 'block' : 'hidden'
-          }`}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: mobileMenuOpen ? 1 : 0, y: mobileMenuOpen ? 0 : -20 }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className="px-4 py-2 space-y-2">
-            {NAVIGATION_ITEMS.map((item) => (
-              <button
-                key={item.id}
-                className={`nav-link block w-full text-left px-3 py-2 rounded-lg transition-all duration-300 ${
-                  isActive(item.path) ? 'active' : ''
-                }`}
-                onClick={() => handleNavigation(item.path)}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </motion.div>
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              className="lg:hidden glassmorphism-strong mt-2 mx-4 rounded-xl border border-white/10 overflow-hidden"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="p-4 space-y-2">
+                {NAVIGATION_ITEMS.map((item) => (
+                  <div key={item.id}>
+                    {'dropdown' in item ? (
+                      <div>
+                        <button
+                          className="w-full text-left px-4 py-3 rounded-lg font-semibold text-white hover:bg-white/10 transition-colors"
+                          onClick={() => handleDropdownToggle(item.id)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span>{item.label}</span>
+                            <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${
+                              activeDropdown === item.id ? 'rotate-180' : ''
+                            }`} />
+                          </div>
+                        </button>
+                        <AnimatePresence>
+                          {activeDropdown === item.id && (
+                            <motion.div
+                              className="ml-4 mt-2 space-y-1"
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              {item.dropdown.map((dropdownItem) => (
+                                <button
+                                  key={dropdownItem.id}
+                                  className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
+                                    isActive(dropdownItem.path) ? 'bg-blue-500/20 text-blue-400' : 'text-slate-300 hover:bg-white/10'
+                                  }`}
+                                  onClick={() => handleNavigation(dropdownItem.path)}
+                                >
+                                  <div className="font-medium">{dropdownItem.label}</div>
+                                  <div className="text-xs text-slate-400 mt-1">{dropdownItem.description}</div>
+                                </button>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    ) : (
+                      <button
+                        className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-300 ${
+                          'path' in item && isActive(item.path) ? 'bg-blue-500/20 text-blue-400' : 'text-white hover:bg-white/10'
+                        }`}
+                        onClick={() => 'path' in item && handleNavigation(item.path)}
+                      >
+                        {item.label}
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  className="w-full glassmorphism-button px-4 py-3 rounded-lg font-semibold mt-4"
+                  onClick={() => handleNavigation('/chat')}
+                >
+                  Get Started
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
     </>
   );

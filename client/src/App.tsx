@@ -13,6 +13,7 @@ import CollegeRecommender from "@/pages/CollegeRecommender";
 import AIPresentations from "@/pages/AIPresentations";
 import SmartCalendar from "@/pages/SmartCalendar";
 import CodeSpark from "@/pages/CodeSpark";
+import Team from "@/pages/Team";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/presentations" component={AIPresentations} />
       <Route path="/calendar" component={SmartCalendar} />
       <Route path="/code" component={CodeSpark} />
+      <Route path="/team" component={Team} />
       <Route component={NotFound} />
     </Switch>
   );

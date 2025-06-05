@@ -9,13 +9,26 @@ export const COLORS = {
 
 export const NAVIGATION_ITEMS = [
   { id: 'home', label: 'Home', path: '/' },
-  { id: 'chat', label: 'SparkTutor', path: '/chat' },
-  { id: 'notes', label: 'Notes Hub', path: '/notes' },
-  { id: 'community', label: 'Community', path: '/community' },
-  { id: 'college', label: 'College Finder', path: '/college' },
-  { id: 'presentations', label: 'AI Presentations', path: '/presentations' },
-  { id: 'calendar', label: 'Smart Calendar', path: '/calendar' },
-  { id: 'code', label: 'CodeSpark', path: '/code' }
+  { id: 'chat', label: 'AI Tutor', path: '/chat' },
+  {
+    id: 'tools',
+    label: 'Learning Tools',
+    dropdown: [
+      { id: 'notes', label: 'Notes Hub', path: '/notes', description: 'Smart note-taking & organization' },
+      { id: 'presentations', label: 'AI Presentations', path: '/presentations', description: 'Create stunning slides with AI' },
+      { id: 'calendar', label: 'Smart Calendar', path: '/calendar', description: 'AI-powered scheduling' },
+      { id: 'code', label: 'CodeSpark', path: '/code', description: 'Interactive programming lessons' }
+    ]
+  },
+  {
+    id: 'connect',
+    label: 'Connect',
+    dropdown: [
+      { id: 'community', label: 'Community', path: '/community', description: 'Join study groups & forums' },
+      { id: 'college', label: 'College Finder', path: '/college', description: 'AI college recommendations' }
+    ]
+  },
+  { id: 'team', label: 'Our Team', path: '/team' }
 ] as const;
 
 export const MOCK_COLLEGE_DATA = [
@@ -102,6 +115,75 @@ For composite functions: d/dx[f(g(x))] = f'(g(x)) · g'(x)`,
     tags: ["History"],
     content: "World War II historical timeline...",
     active: false
+  }
+];
+
+export const TEAM_DATA = [
+  {
+    id: 1,
+    name: "Dr. Sarah Chen",
+    role: "CEO & Co-Founder",
+    designation: "Former Google AI Research Lead",
+    image: "SC",
+    linkedin: "https://linkedin.com/in/sarahchen",
+    email: "sarah@coexistai.com",
+    bio: "Leading AI education innovation with 10+ years in machine learning research.",
+    gradient: "from-blue-500 to-purple-600"
+  },
+  {
+    id: 2,
+    name: "Marcus Rodriguez",
+    role: "CTO & Co-Founder",
+    designation: "Ex-Microsoft Principal Engineer",
+    image: "MR",
+    linkedin: "https://linkedin.com/in/marcusrodriguez",
+    email: "marcus@coexistai.com",
+    bio: "Building scalable educational platforms with expertise in distributed systems.",
+    gradient: "from-green-500 to-blue-600"
+  },
+  {
+    id: 3,
+    name: "Dr. Priya Patel",
+    role: "Head of AI Research",
+    designation: "PhD in Computer Science, Stanford",
+    image: "PP",
+    linkedin: "https://linkedin.com/in/priyapatel",
+    email: "priya@coexistai.com",
+    bio: "Developing next-generation AI tutoring systems and personalized learning algorithms.",
+    gradient: "from-purple-500 to-pink-600"
+  },
+  {
+    id: 4,
+    name: "James Wilson",
+    role: "Head of Product",
+    designation: "Former Coursera Product Lead",
+    image: "JW",
+    linkedin: "https://linkedin.com/in/jameswilson",
+    email: "james@coexistai.com",
+    bio: "Designing intuitive learning experiences that scale globally.",
+    gradient: "from-orange-500 to-red-600"
+  },
+  {
+    id: 5,
+    name: "Emily Zhang",
+    role: "Lead UX Designer",
+    designation: "Design Systems Specialist",
+    image: "EZ",
+    linkedin: "https://linkedin.com/in/emilyzhang",
+    email: "emily@coexistai.com",
+    bio: "Creating beautiful, accessible interfaces that make learning enjoyable.",
+    gradient: "from-teal-500 to-green-600"
+  },
+  {
+    id: 6,
+    name: "Alex Kumar",
+    role: "Head of Engineering",
+    designation: "Full-Stack Architecture Expert",
+    image: "AK",
+    linkedin: "https://linkedin.com/in/alexkumar",
+    email: "alex@coexistai.com",
+    bio: "Building robust, secure infrastructure for millions of learners worldwide.",
+    gradient: "from-indigo-500 to-blue-600"
   }
 ];
 
