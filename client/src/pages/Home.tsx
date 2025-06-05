@@ -149,22 +149,185 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Features Grid */}
+      {/* Feature Previews */}
       <section className="py-20 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 scroll-reveal">
-            <h2 className="text-4xl font-bold mb-4">Powerful Learning Tools</h2>
-            <p className="text-slate-400 text-lg">Everything you need to excel in your studies</p>
+            <h2 className="text-4xl font-bold mb-4">Experience AI-Powered Learning</h2>
+            <p className="text-slate-400 text-lg">Discover how our intelligent tools transform your educational journey</p>
           </div>
           
+          {/* SparkTutor Chat Preview */}
           <motion.div 
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="glassmorphism rounded-2xl p-8 mb-12 scroll-reveal cursor-pointer group"
+            onClick={() => setLocation('/chat')}
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="grid lg:grid-cols-2 gap-8 items-center">
+              <div>
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg flex items-center justify-center">
+                    <MessageCircle className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold">SparkTutor AI Chat</h3>
+                    <p className="text-slate-400">Your personal AI learning assistant</p>
+                  </div>
+                </div>
+                <p className="text-slate-300 mb-6 leading-relaxed">
+                  Get instant help with homework, explanations of complex concepts, and step-by-step problem solving. 
+                  Our AI tutor supports text, voice, and image inputs to help you learn in your preferred way.
+                </p>
+                <div className="flex flex-wrap gap-3 mb-6">
+                  <span className="px-3 py-1 bg-blue-500/20 rounded-full text-blue-400 text-sm">Voice Recognition</span>
+                  <span className="px-3 py-1 bg-green-500/20 rounded-full text-green-400 text-sm">Image Analysis</span>
+                  <span className="px-3 py-1 bg-purple-500/20 rounded-full text-purple-400 text-sm">24/7 Available</span>
+                </div>
+                <GlassmorphismButton>
+                  Start Chatting <ArrowRight className="inline w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </GlassmorphismButton>
+              </div>
+              <div className="glassmorphism rounded-xl p-6">
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Sparkles className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="glassmorphism rounded-lg rounded-tl-none p-3 flex-1">
+                      <p className="text-sm text-white">Hello! I can help you with calculus derivatives. What specific topic would you like to explore?</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3 justify-end">
+                    <div className="bg-blue-500 rounded-lg rounded-tr-none p-3 max-w-xs">
+                      <p className="text-sm text-white">Can you explain the chain rule?</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* AI Presentations Preview */}
+          <motion.div 
+            className="glassmorphism rounded-2xl p-8 mb-12 scroll-reveal cursor-pointer group"
+            onClick={() => setLocation('/presentations')}
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="grid lg:grid-cols-2 gap-8 items-center">
+              <div className="order-2 lg:order-1">
+                <div className="aspect-video glassmorphism rounded-lg bg-gradient-to-br from-purple-500 to-blue-600 flex flex-col justify-center items-center text-center text-white p-6">
+                  <h1 className="text-2xl font-bold mb-3">The Solar System</h1>
+                  <h2 className="text-lg mb-4">An Introduction to Our Cosmic Neighborhood</h2>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-6 h-6 bg-yellow-400 rounded-full animate-pulse"></div>
+                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                    <div className="w-4 h-4 bg-red-500 rounded-full"></div>
+                    <div className="w-5 h-5 bg-orange-500 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+              <div className="order-1 lg:order-2">
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                    <Presentation className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold">AI Presentations</h3>
+                    <p className="text-slate-400">Create stunning slides with AI assistance</p>
+                  </div>
+                </div>
+                <p className="text-slate-300 mb-6 leading-relaxed">
+                  Transform your ideas into professional presentations effortlessly. Our AI helps with content generation, 
+                  design suggestions, and slide optimization. Export directly to PowerPoint format.
+                </p>
+                <div className="flex flex-wrap gap-3 mb-6">
+                  <span className="px-3 py-1 bg-purple-500/20 rounded-full text-purple-400 text-sm">Auto-Design</span>
+                  <span className="px-3 py-1 bg-pink-500/20 rounded-full text-pink-400 text-sm">Content AI</span>
+                  <span className="px-3 py-1 bg-blue-500/20 rounded-full text-blue-400 text-sm">PPT Export</span>
+                </div>
+                <GlassmorphismButton>
+                  Create Presentation <ArrowRight className="inline w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </GlassmorphismButton>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Smart Calendar Preview */}
+          <motion.div 
+            className="glassmorphism rounded-2xl p-8 mb-12 scroll-reveal cursor-pointer group"
+            onClick={() => setLocation('/calendar')}
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="grid lg:grid-cols-2 gap-8 items-center">
+              <div>
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center">
+                    <Calendar className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold">Smart Calendar</h3>
+                    <p className="text-slate-400">AI-powered scheduling and planning</p>
+                  </div>
+                </div>
+                <p className="text-slate-300 mb-6 leading-relaxed">
+                  Optimize your study schedule with intelligent suggestions. Sync with Google Calendar, 
+                  get AI-powered study recommendations, and never miss important deadlines again.
+                </p>
+                <div className="flex flex-wrap gap-3 mb-6">
+                  <span className="px-3 py-1 bg-green-500/20 rounded-full text-green-400 text-sm">Google Sync</span>
+                  <span className="px-3 py-1 bg-teal-500/20 rounded-full text-teal-400 text-sm">Smart Suggestions</span>
+                  <span className="px-3 py-1 bg-blue-500/20 rounded-full text-blue-400 text-sm">Deadline Tracking</span>
+                </div>
+                <GlassmorphismButton>
+                  Open Calendar <ArrowRight className="inline w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </GlassmorphismButton>
+              </div>
+              <div className="glassmorphism rounded-xl p-4">
+                <div className="grid grid-cols-7 gap-1 mb-4">
+                  {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
+                    <div key={`day-${index}`} className="text-center py-1 text-slate-400 text-sm font-semibold">
+                      {day}
+                    </div>
+                  ))}
+                  {Array.from({ length: 21 }, (_, i) => (
+                    <div key={i} className="aspect-square glassmorphism rounded text-center text-xs pt-1 relative">
+                      <span className="text-white">{i + 1}</span>
+                      {[5, 12, 18].includes(i + 1) && (
+                        <div className={`absolute bottom-1 left-1 right-1 h-1 rounded ${
+                          i + 1 === 5 ? 'bg-blue-500' :
+                          i + 1 === 12 ? 'bg-green-500' :
+                          'bg-purple-500'
+                        }`}></div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 text-xs">
+                    <div className="w-2 h-2 bg-blue-500 rounded"></div>
+                    <span className="text-slate-400">Math Exam</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-xs">
+                    <div className="w-2 h-2 bg-green-500 rounded"></div>
+                    <span className="text-slate-400">Study Group</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Additional Features Grid */}
+          <motion.div 
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
           >
-            {features.map((feature, index) => (
+            {features.slice(3).map((feature, index) => (
               <motion.div
                 key={feature.title}
                 className="glassmorphism rounded-xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer group"
@@ -177,7 +340,7 @@ const Home = () => {
                 <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
                 <p className="text-slate-400 mb-4">{feature.description}</p>
                 <button className="text-blue-500 hover:text-green-500 transition-colors duration-300 group-hover:translate-x-1 transition-transform">
-                  Try Now <ArrowRight className="inline w-4 h-4 ml-1" />
+                  Explore <ArrowRight className="inline w-4 h-4 ml-1" />
                 </button>
               </motion.div>
             ))}
@@ -194,7 +357,7 @@ const Home = () => {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-2xl font-semibold mb-3">CodeSpark Module</h3>
-                  <p className="text-slate-400 mb-4">Master programming with interactive lessons, code editor, and structured learning paths.</p>
+                  <p className="text-slate-400 mb-4">Master programming with interactive lessons, code editor, and structured learning paths for Python and JavaScript.</p>
                   <GlassmorphismButton>
                     Start Coding <ArrowRight className="inline w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </GlassmorphismButton>
