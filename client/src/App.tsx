@@ -14,6 +14,9 @@ import AIPresentations from "@/pages/AIPresentations";
 import SmartCalendar from "@/pages/SmartCalendar";
 import CodeSpark from "@/pages/CodeSpark";
 import Team from "@/pages/Team";
+import Login from "@/pages/Login";
+import Signup from "@/pages/Signup";
+import ForgotPassword from "@/pages/ForgotPassword";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -28,6 +31,9 @@ function Router() {
       <Route path="/calendar" component={SmartCalendar} />
       <Route path="/code" component={CodeSpark} />
       <Route path="/team" component={Team} />
+      <Route path="/login" component={Login} />
+      <Route path="/signup" component={Signup} />
+      <Route path="/forgot-password" component={ForgotPassword} />
       <Route component={NotFound} />
     </Switch>
   );

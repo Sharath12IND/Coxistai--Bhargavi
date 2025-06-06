@@ -2,10 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Sparkles, 
-  Phone, 
-  Video, 
   Mic, 
-  Image, 
   Paperclip, 
   Send, 
   User 
@@ -111,12 +108,8 @@ const SparkTutorChat = () => {
               </div>
             </div>
             <div className="flex space-x-2">
-              <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
-                <Phone className="w-5 h-5" />
-              </button>
-              <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
-                <Video className="w-5 h-5" />
-              </button>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span className="text-xs text-slate-400">AI Ready</span>
             </div>
           </div>
           
@@ -176,14 +169,6 @@ const SparkTutorChat = () => {
                   title="Voice Input"
                 >
                   <Mic className="w-5 h-5" />
-                </GlassmorphismButton>
-                <GlassmorphismButton 
-                  size="sm" 
-                  variant="outline"
-                  className="p-3"
-                  title="Upload Image"
-                >
-                  <Image className="w-5 h-5" />
                 </GlassmorphismButton>
                 <GlassmorphismButton 
                   size="sm" 
