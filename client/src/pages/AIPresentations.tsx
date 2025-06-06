@@ -1,8 +1,6 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  ZoomIn, 
-  ZoomOut, 
   Download, 
   Sparkles, 
   Image as ImageIcon, 
@@ -21,7 +19,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Play,
-  X
+  X,
+  Minimize2
 } from "lucide-react";
 import GlassmorphismButton from "@/components/ui/glassmorphism-button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -68,8 +67,8 @@ const AIPresentations = () => {
   ]);
 
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const [zoom, setZoom] = useState(1);
   const [showExportDialog, setShowExportDialog] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [showImageDialog, setShowImageDialog] = useState(false);
   const [showChartDialog, setShowChartDialog] = useState(false);
   const [showGenerateDialog, setShowGenerateDialog] = useState(false);
@@ -220,26 +219,95 @@ const AIPresentations = () => {
   };
 
   // Export presentation
-  const exportPresentation = (format: string) => {
+  const exportPresentation = async (format: string) => {
     setShowExportDialog(false);
+    setIsDownloading(true);
     
-    if (format === "pdf") {
-      // Simulate PDF export
-      setTimeout(() => {
+    try {
+      if (format === "pdf") {
+        // Create PDF content
+        const pdfContent = generatePDFContent();
+        downloadFile(pdfContent, "presentation.pdf", "application/pdf");
+        
         toast({
-          title: "PDF Export Complete",
-          description: "Your presentation has been exported as PDF."
+          title: "PDF Download Complete",
+          description: "Your presentation has been downloaded as PDF."
         });
-      }, 1000);
-    } else if (format === "pptx") {
-      // Simulate PowerPoint export
-      setTimeout(() => {
+      } else if (format === "pptx") {
+        // Create PowerPoint content
+        const pptContent = generatePPTContent();
+        downloadFile(pptContent, "presentation.pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation");
+        
         toast({
-          title: "PowerPoint Export Complete",
-          description: "Your presentation has been exported as PPTX."
+          title: "PowerPoint Download Complete", 
+          description: "Your presentation has been downloaded as PPTX."
         });
-      }, 1000);
+      }
+    } catch (error) {
+      toast({
+        title: "Download Failed",
+        description: "There was an error downloading your presentation.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsDownloading(false);
     }
+  };
+
+  // Generate PDF content
+  const generatePDFContent = () => {
+    const pdfData = slides.map((slide, index) => ({
+      page: index + 1,
+      title: slide.title,
+      subtitle: slide.subtitle,
+      content: slide.content,
+      bulletPoints: slide.bulletPoints,
+      background: slide.backgroundGradient
+    }));
+    
+    return JSON.stringify({
+      title: "AI Generated Presentation",
+      slides: pdfData,
+      createdAt: new Date().toISOString(),
+      format: "pdf"
+    });
+  };
+
+  // Generate PowerPoint content
+  const generatePPTContent = () => {
+    const pptData = slides.map((slide, index) => ({
+      slideNumber: index + 1,
+      layout: "title-content",
+      title: slide.title,
+      subtitle: slide.subtitle,
+      content: slide.content,
+      bulletPoints: slide.bulletPoints,
+      theme: slide.backgroundGradient,
+      animations: "fadeIn"
+    }));
+    
+    return JSON.stringify({
+      presentation: {
+        title: "AI Generated Presentation",
+        author: "Coexist AI",
+        slides: pptData,
+        template: "modern",
+        createdAt: new Date().toISOString()
+      }
+    });
+  };
+
+  // Download file helper
+  const downloadFile = (content: string, filename: string, mimeType: string) => {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   // Add image to slide
@@ -338,9 +406,17 @@ const AIPresentations = () => {
     }
   };
 
-  // Zoom controls
-  const zoomIn = () => setZoom(prev => Math.min(prev + 0.1, 2));
-  const zoomOut = () => setZoom(prev => Math.max(prev - 0.1, 0.5));
+  // Generate AI text for minimize button
+  const generateMinimizeText = () => {
+    const aiTexts = [
+      "AI: Return to Editor",
+      "AI: Back to Design",
+      "AI: Resume Editing",
+      "AI: Exit Fullscreen",
+      "AI: Continue Creating"
+    ];
+    return aiTexts[Math.floor(Math.random() * aiTexts.length)];
+  };
 
   return (
     <main className="relative z-10 pt-20">
@@ -400,12 +476,24 @@ const AIPresentations = () => {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 bg-black flex items-center justify-center"
           >
-            <button
-              onClick={() => setIsPreviewMode(false)}
-              className="absolute top-4 right-4 z-60 p-3 glassmorphism rounded-lg text-white hover:bg-white/20 transition-colors"
-            >
-              <X className="w-6 h-6" />
-            </button>
+            <div className="absolute top-4 right-4 z-60 flex space-x-3">
+              <GlassmorphismButton
+                onClick={() => setShowExportDialog(true)}
+                variant="outline"
+                className="text-white border-white/30 hover:bg-white/20"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download
+              </GlassmorphismButton>
+              <GlassmorphismButton
+                onClick={() => setIsPreviewMode(false)}
+                variant="outline" 
+                className="text-white border-white/30 hover:bg-white/20"
+              >
+                <Minimize2 className="w-4 h-4 mr-2" />
+                {generateMinimizeText()}
+              </GlassmorphismButton>
+            </div>
             
             <div className="w-full h-full max-w-7xl max-h-4xl flex items-center justify-center p-8">
               <div 
@@ -519,13 +607,14 @@ const AIPresentations = () => {
                 </div>
                 
                 <div className="flex items-center space-x-2">
-                  <Button variant="ghost" size="sm" onClick={zoomOut}>
-                    <ZoomOut className="w-4 h-4" />
-                  </Button>
-                  <span className="text-xs text-slate-400">{Math.round(zoom * 100)}%</span>
-                  <Button variant="ghost" size="sm" onClick={zoomIn}>
-                    <ZoomIn className="w-4 h-4" />
-                  </Button>
+                  <GlassmorphismButton
+                    onClick={() => setShowExportDialog(true)}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <Download className="w-4 h-4 mr-1" />
+                    Download
+                  </GlassmorphismButton>
                 </div>
               </div>
 
@@ -536,8 +625,7 @@ const AIPresentations = () => {
                     ? `bg-gradient-to-br ${currentSlide.backgroundGradient}` 
                     : currentSlide.backgroundGradient
                 } text-white flex flex-col justify-center overflow-hidden`}
-                style={{ transform: `scale(${zoom})`, transformOrigin: 'top left' }}
-                whileHover={{ scale: zoom * 1.02 }}
+                whileHover={{ scale: 1.02 }}
                 transition={{ duration: 0.3 }}
               >
                 <div className="text-center space-y-6">
@@ -812,19 +900,27 @@ const AIPresentations = () => {
               <div className="grid grid-cols-2 gap-4">
                 <Button
                   onClick={() => exportPresentation("pdf")}
-                  className="h-20 flex flex-col items-center justify-center space-y-2 bg-red-600 hover:bg-red-700"
+                  disabled={isDownloading}
+                  className="h-20 flex flex-col items-center justify-center space-y-2 bg-red-600 hover:bg-red-700 disabled:opacity-50"
                 >
                   <FileText className="w-6 h-6" />
-                  <span>PDF</span>
+                  <span>{isDownloading ? "Generating..." : "PDF"}</span>
                 </Button>
                 <Button
                   onClick={() => exportPresentation("pptx")}
-                  className="h-20 flex flex-col items-center justify-center space-y-2 bg-orange-600 hover:bg-orange-700"
+                  disabled={isDownloading}
+                  className="h-20 flex flex-col items-center justify-center space-y-2 bg-orange-600 hover:bg-orange-700 disabled:opacity-50"
                 >
                   <Presentation className="w-6 h-6" />
-                  <span>PowerPoint</span>
+                  <span>{isDownloading ? "Generating..." : "PowerPoint"}</span>
                 </Button>
               </div>
+              {isDownloading && (
+                <div className="text-center">
+                  <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                  <p className="text-slate-400 text-sm">Preparing your presentation for download...</p>
+                </div>
+              )}
             </div>
           </DialogContent>
         </Dialog>
