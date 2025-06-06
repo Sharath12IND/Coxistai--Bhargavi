@@ -1,158 +1,232 @@
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Search, 
-  Share, 
-  Download, 
-  Bold, 
-  Italic, 
-  Underline, 
-  List, 
-  ListOrdered, 
-  Image, 
-  Link,
-  Upload,
+  Plus,
   FileText,
   Trash2,
-  Eye,
-  Copy,
-  Plus,
+  Edit3,
+  Save,
   X,
   Tag
 } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import GlassmorphismButton from "@/components/ui/glassmorphism-button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import type { Document } from "@shared/schema";
+import RichTextEditor from "@/components/ui/rich-text-editor";
+
+interface Note {
+  id: string;
+  title: string;
+  content: string;
+  tags: string[];
+  category: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 const NotesHub = () => {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
-  const [showUploadDialog, setShowUploadDialog] = useState(false);
-  const [showShareDialog, setShowShareDialog] = useState(false);
-  const [uploadTitle, setUploadTitle] = useState("");
-  const [uploadTags, setUploadTags] = useState("");
-  const [isPublic, setIsPublic] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [showNewNoteDialog, setShowNewNoteDialog] = useState(false);
+  const [newNoteTitle, setNewNoteTitle] = useState("");
+  const [newNoteTags, setNewNoteTags] = useState("");
+  const [newNoteCategory, setNewNoteCategory] = useState("Math");
+  const [isEditing, setIsEditing] = useState(false);
 
-  // Fetch documents
-  const { data: documents = [], isLoading } = useQuery({
-    queryKey: ["/api/documents"],
-    queryFn: async () => {
-      const response = await fetch("/api/documents?userId=1");
-      if (!response.ok) throw new Error("Failed to fetch documents");
-      return response.json();
-    },
-  });
+  // Load notes from localStorage on component mount
+  useEffect(() => {
+    const savedNotes = localStorage.getItem('coexist-notes');
+    if (savedNotes) {
+      try {
+        const parsedNotes = JSON.parse(savedNotes);
+        setNotes(parsedNotes);
+        
+        // Load default notes if none exist
+        if (parsedNotes.length === 0) {
+          loadDefaultNotes();
+        }
+      } catch (error) {
+        console.error('Error parsing saved notes:', error);
+        loadDefaultNotes();
+      }
+    } else {
+      loadDefaultNotes();
+    }
+  }, []);
 
-  // Upload document mutation
-  const uploadMutation = useMutation({
-    mutationFn: async (formData: FormData) => {
-      const response = await fetch("/api/documents", {
-        method: "POST",
-        body: formData,
-      });
-      if (!response.ok) throw new Error("Upload failed");
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
-      setShowUploadDialog(false);
-      setSelectedFile(null);
-      setUploadTitle("");
-      setUploadTags("");
-      setIsPublic(false);
-      toast({
-        title: "Document Uploaded",
-        description: "Your document has been added to the library.",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Upload Failed",
-        description: "There was an error uploading your document.",
-        variant: "destructive",
-      });
-    },
-  });
+  // Save notes to localStorage whenever notes change
+  useEffect(() => {
+    localStorage.setItem('coexist-notes', JSON.stringify(notes));
+  }, [notes]);
 
-  // Delete document mutation
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const response = await fetch(`/api/documents/${id}`, { method: "DELETE" });
-      if (!response.ok) throw new Error("Delete failed");
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/documents"] });
-      setSelectedDocument(null);
-      toast({
-        title: "Document Deleted",
-        description: "Document has been removed from your library.",
-      });
-    },
-  });
+  const loadDefaultNotes = () => {
+    const defaultNotes: Note[] = [
+      {
+        id: "1",
+        title: "Calculus Derivatives",
+        content: `<h1>Calculus Derivatives</h1>
+        
+<h2>Definition</h2>
+<p>The derivative of a function measures the rate at which the function's value changes with respect to changes in its input. It represents the slope of the tangent line to the function's graph at any given point.</p>
 
-  const categories = ["All", "PDF", "Text", "Document"];
+<h2>Basic Formula</h2>
+<p><strong>f'(x) = lim(h→0) [f(x+h) - f(x)] / h</strong></p>
+
+<h2>Common Derivatives</h2>
+<ul>
+  <li><strong>d/dx(x^n) = nx^(n-1)</strong></li>
+  <li><strong>d/dx(sin x) = cos x</strong></li>
+  <li><strong>d/dx(cos x) = -sin x</strong></li>
+  <li><strong>d/dx(e^x) = e^x</strong></li>
+</ul>
+
+<h2>Chain Rule</h2>
+<p>For composite functions: <strong>d/dx[f(g(x))] = f'(g(x)) · g'(x)</strong></p>`,
+        tags: ["Math", "Calculus"],
+        category: "Math",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      {
+        id: "2",
+        title: "Organic Chemistry Basics",
+        content: `<h1>Organic Chemistry Basics</h1>
+        
+<h2>Hydrocarbons</h2>
+<p>Organic compounds consisting entirely of hydrogen and carbon atoms.</p>
+
+<h3>Types:</h3>
+<ul>
+  <li><strong>Alkanes</strong> - Single bonds only (saturated)</li>
+  <li><strong>Alkenes</strong> - One or more double bonds</li>
+  <li><strong>Alkynes</strong> - One or more triple bonds</li>
+</ul>
+
+<h2>Functional Groups</h2>
+<p>Specific arrangements of atoms that give organic molecules their characteristic properties.</p>`,
+        tags: ["Chemistry"],
+        category: "Science",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      {
+        id: "3",
+        title: "World War II Timeline",
+        content: `<h1>World War II Timeline</h1>
+        
+<h2>Key Events</h2>
+<ul>
+  <li><strong>1939</strong> - Germany invades Poland, Britain and France declare war</li>
+  <li><strong>1940</strong> - Battle of Britain, Blitz begins</li>
+  <li><strong>1941</strong> - Pearl Harbor attack, US enters war</li>
+  <li><strong>1942</strong> - Battle of Stalingrad begins</li>
+  <li><strong>1944</strong> - D-Day invasion of Normandy</li>
+  <li><strong>1945</strong> - Germany surrenders, atomic bombs dropped on Japan</li>
+</ul>`,
+        tags: ["History"],
+        category: "History",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    ];
+    setNotes(defaultNotes);
+  };
+
+  const categories = ["All", "Math", "Science", "History", "Literature", "Physics", "Chemistry"];
   
-  const filteredDocuments = (documents as Document[]).filter((doc: Document) => {
-    const matchesSearch = doc.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = activeCategory === "All" || 
-      (activeCategory === "PDF" && doc.fileType.includes("pdf")) ||
-      (activeCategory === "Text" && doc.fileType.includes("text")) ||
-      (activeCategory === "Document" && (doc.fileType.includes("doc") || doc.fileType.includes("application")));
+  const filteredNotes = notes.filter((note: Note) => {
+    const matchesSearch = note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         note.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         note.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesCategory = activeCategory === "All" || note.category === activeCategory;
     return matchesSearch && matchesCategory;
   });
 
-  // Handle file upload
-  const handleFileUpload = () => {
-    if (!selectedFile) {
+  const handleCreateNote = () => {
+    if (!newNoteTitle.trim()) {
       toast({
-        title: "No File Selected",
-        description: "Please select a file to upload.",
+        title: "Title Required",
+        description: "Please enter a title for your note.",
         variant: "destructive",
       });
       return;
     }
 
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-    formData.append("title", uploadTitle || selectedFile.name);
-    formData.append("tags", JSON.stringify(uploadTags.split(",").map(tag => tag.trim()).filter(Boolean)));
-    formData.append("isPublic", isPublic.toString());
-    formData.append("userId", "1");
+    const newNote: Note = {
+      id: Date.now().toString(),
+      title: newNoteTitle,
+      content: `<h1>${newNoteTitle}</h1><p>Start writing your notes here...</p>`,
+      tags: newNoteTags.split(",").map(tag => tag.trim()).filter(Boolean),
+      category: newNoteCategory,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
 
-    uploadMutation.mutate(formData);
+    setNotes(prev => [newNote, ...prev]);
+    setSelectedNote(newNote);
+    setIsEditing(true);
+    setShowNewNoteDialog(false);
+    setNewNoteTitle("");
+    setNewNoteTags("");
+    setNewNoteCategory("Math");
+
+    toast({
+      title: "Note Created",
+      description: "Your new note has been created successfully.",
+    });
   };
 
-  // Handle sharing
-  const handleShare = (document: Document) => {
-    if (document.shareCode) {
-      const shareUrl = `${window.location.origin}/shared/${document.shareCode}`;
-      navigator.clipboard.writeText(shareUrl);
-      toast({
-        title: "Share Link Copied",
-        description: "Share link has been copied to clipboard.",
-      });
+  const handleUpdateNote = (content: string) => {
+    if (!selectedNote) return;
+
+    const updatedNote = {
+      ...selectedNote,
+      content,
+      updatedAt: new Date().toISOString(),
+    };
+
+    setNotes(prev => prev.map(note => 
+      note.id === selectedNote.id ? updatedNote : note
+    ));
+    setSelectedNote(updatedNote);
+  };
+
+  const handleSaveNote = () => {
+    setIsEditing(false);
+    toast({
+      title: "Note Saved",
+      description: "Your note has been saved successfully.",
+    });
+  };
+
+  const handleDeleteNote = (noteId: string) => {
+    setNotes(prev => prev.filter(note => note.id !== noteId));
+    if (selectedNote?.id === noteId) {
+      setSelectedNote(null);
+      setIsEditing(false);
     }
+    toast({
+      title: "Note Deleted",
+      description: "Note has been removed from your library.",
+    });
   };
 
-  // Format date
-  const formatDate = (dateString: string | Date | null) => {
-    if (!dateString) return "Unknown";
-    return new Date(dateString).toLocaleDateString();
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
@@ -168,14 +242,14 @@ const NotesHub = () => {
               transition={{ duration: 0.6 }}
             >
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold">Document Library</h2>
+                <h2 className="text-2xl font-bold">Notes Hub</h2>
                 <GlassmorphismButton
-                  onClick={() => setShowUploadDialog(true)}
+                  onClick={() => setShowNewNoteDialog(true)}
                   className="bg-gradient-to-r from-blue-500 to-green-500"
                   size="sm"
                 >
-                  <Upload className="w-4 h-4 mr-2" />
-                  Upload
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Note
                 </GlassmorphismButton>
               </div>
               <div className="space-y-4">
@@ -183,7 +257,7 @@ const NotesHub = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input 
                     type="text" 
-                    placeholder="Search documents..." 
+                    placeholder="Search notes..." 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full glassmorphism rounded-lg p-3 pl-10 bg-transparent outline-none placeholder-slate-400 text-white"
@@ -207,22 +281,23 @@ const NotesHub = () => {
               </div>
             </motion.div>
             
-            {/* Documents List */}
+            {/* Notes List */}
             <div className="space-y-3">
-              {isLoading ? (
-                <div className="text-center text-slate-400 py-8">Loading documents...</div>
-              ) : filteredDocuments.length === 0 ? (
+              {filteredNotes.length === 0 ? (
                 <div className="text-center text-slate-400 py-8">
-                  No documents found. Upload your first document to get started.
+                  No notes found. Create your first note to get started.
                 </div>
               ) : (
-                filteredDocuments.map((doc: Document, index: number) => (
+                filteredNotes.map((note: Note, index: number) => (
                   <motion.div
-                    key={doc.id}
+                    key={note.id}
                     className={`glassmorphism rounded-lg p-4 hover:bg-white/5 transition-all cursor-pointer ${
-                      selectedDocument?.id === doc.id ? 'border-l-4 border-blue-500' : ''
+                      selectedNote?.id === note.id ? 'border-l-4 border-blue-500' : ''
                     }`}
-                    onClick={() => setSelectedDocument(doc)}
+                    onClick={() => {
+                      setSelectedNote(note);
+                      setIsEditing(false);
+                    }}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1, duration: 0.5 }}
@@ -233,14 +308,15 @@ const NotesHub = () => {
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-1">
                           <FileText className="w-4 h-4 text-blue-400" />
-                          <h3 className="font-semibold text-white truncate">{doc.title}</h3>
+                          <h3 className="font-semibold text-white truncate">{note.title}</h3>
                         </div>
                         <p className="text-sm text-slate-400">
-                          Uploaded {formatDate(doc.createdAt as string)}
+                          {formatDate(note.updatedAt)}
                         </p>
-                        {doc.tags && doc.tags.length > 0 && (
-                          <div className="flex space-x-1 mt-2 flex-wrap">
-                            {doc.tags.map((tag: string) => (
+                        <p className="text-xs text-green-400 mb-2">{note.category}</p>
+                        {note.tags.length > 0 && (
+                          <div className="flex space-x-1 flex-wrap">
+                            {note.tags.map((tag: string) => (
                               <span 
                                 key={tag}
                                 className="px-2 py-1 rounded text-xs bg-blue-500/20 text-blue-400"
@@ -257,18 +333,7 @@ const NotesHub = () => {
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleShare(doc);
-                          }}
-                          className="h-8 w-8 p-0"
-                        >
-                          <Share className="w-3 h-3" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteMutation.mutate(doc.id);
+                            handleDeleteNote(note.id);
                           }}
                           className="h-8 w-8 p-0 text-red-400 hover:text-red-300"
                         >
@@ -284,137 +349,149 @@ const NotesHub = () => {
           
           {/* Editor */}
           <div className="lg:w-2/3">
-            <motion.div 
-              className="glassmorphism rounded-xl overflow-hidden"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              {selectedDocument ? (
-                <>
-                  {/* Document Header */}
-                  <div className="border-b border-white/10 p-4 flex items-center justify-between">
-                    <div>
-                      <h3 className="font-bold text-lg text-white">{selectedDocument.title}</h3>
-                      <p className="text-sm text-slate-400">
-                        {selectedDocument.fileType} • {formatDate(selectedDocument.createdAt as string)}
-                      </p>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleShare(selectedDocument)}
-                        className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                      >
-                        <Share className="w-5 h-5" />
-                      </Button>
-                      <GlassmorphismButton size="sm">
-                        <Download className="w-4 h-4 inline mr-2" />
-                        Download
-                      </GlassmorphismButton>
-                    </div>
-                  </div>
-                  
-                  {/* Document Content */}
-                  <div className="p-6 min-h-[400px] text-white">
-                    <div className="prose prose-invert max-w-none">
-                      <h1 className="text-2xl font-bold mb-4">{selectedDocument.title}</h1>
-                      {selectedDocument.tags && selectedDocument.tags.length > 0 && (
-                        <div className="flex space-x-2 mb-6">
-                          {selectedDocument.tags.map((tag: string) => (
-                            <span 
-                              key={tag}
-                              className="px-3 py-1 rounded-full text-sm bg-blue-500/20 text-blue-400"
-                            >
-                              <Tag className="w-3 h-3 inline mr-1" />
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                      <div className="whitespace-pre-wrap text-slate-200 leading-relaxed">
-                        {selectedDocument.content || "No content available for this document."}
+            {selectedNote ? (
+              <motion.div 
+                className="space-y-4"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                {/* Note Header */}
+                <div className="glassmorphism rounded-xl p-4 flex items-center justify-between">
+                  <div>
+                    <h3 className="font-bold text-lg text-white">{selectedNote.title}</h3>
+                    <p className="text-sm text-slate-400">
+                      {selectedNote.category} • Last edited {formatDate(selectedNote.updatedAt)}
+                    </p>
+                    {selectedNote.tags.length > 0 && (
+                      <div className="flex space-x-2 mt-2">
+                        {selectedNote.tags.map((tag: string) => (
+                          <span 
+                            key={tag}
+                            className="px-3 py-1 rounded-full text-sm bg-blue-500/20 text-blue-400"
+                          >
+                            <Tag className="w-3 h-3 inline mr-1" />
+                            {tag}
+                          </span>
+                        ))}
                       </div>
-                    </div>
+                    )}
                   </div>
-                </>
-              ) : (
-                <div className="flex items-center justify-center h-96 text-slate-400">
-                  <div className="text-center">
-                    <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                    <h3 className="text-xl font-semibold mb-2">No Document Selected</h3>
-                    <p>Select a document from the library or upload a new one to get started.</p>
+                  <div className="flex space-x-2">
+                    {isEditing ? (
+                      <GlassmorphismButton 
+                        onClick={handleSaveNote}
+                        size="sm"
+                        className="bg-gradient-to-r from-green-500 to-blue-500"
+                      >
+                        <Save className="w-4 h-4 mr-2" />
+                        Save
+                      </GlassmorphismButton>
+                    ) : (
+                      <GlassmorphismButton 
+                        onClick={() => setIsEditing(true)}
+                        size="sm"
+                      >
+                        <Edit3 className="w-4 h-4 mr-2" />
+                        Edit
+                      </GlassmorphismButton>
+                    )}
                   </div>
                 </div>
-              )}
-            </motion.div>
+                
+                {/* Rich Text Editor */}
+                {isEditing ? (
+                  <RichTextEditor
+                    content={selectedNote.content}
+                    onUpdate={handleUpdateNote}
+                    title={selectedNote.title}
+                  />
+                ) : (
+                  <motion.div 
+                    className="glassmorphism rounded-xl p-6 min-h-[400px]"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div 
+                      className="prose prose-invert max-w-none text-white"
+                      dangerouslySetInnerHTML={{ __html: selectedNote.content }}
+                    />
+                  </motion.div>
+                )}
+              </motion.div>
+            ) : (
+              <motion.div 
+                className="glassmorphism rounded-xl flex items-center justify-center h-96 text-slate-400"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <div className="text-center">
+                  <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                  <h3 className="text-xl font-semibold mb-2">No Note Selected</h3>
+                  <p>Select a note from the library or create a new one to get started.</p>
+                </div>
+              </motion.div>
+            )}
           </div>
         </div>
 
-        {/* Upload Dialog */}
-        <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
+        {/* New Note Dialog */}
+        <Dialog open={showNewNoteDialog} onOpenChange={setShowNewNoteDialog}>
           <DialogContent className="bg-slate-900 border-white/20">
             <DialogHeader>
-              <DialogTitle className="text-white">Upload Document</DialogTitle>
+              <DialogTitle className="text-white">Create New Note</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label className="text-white">File</Label>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                  className="w-full p-3 glassmorphism rounded-lg bg-white/5 border-white/20 text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600"
-                  accept=".pdf,.txt,.doc,.docx"
-                />
-              </div>
-              
-              <div>
-                <Label className="text-white">Title (Optional)</Label>
+                <Label className="text-white">Title</Label>
                 <Input
-                  value={uploadTitle}
-                  onChange={(e) => setUploadTitle(e.target.value)}
-                  placeholder="Custom title for your document"
+                  value={newNoteTitle}
+                  onChange={(e) => setNewNoteTitle(e.target.value)}
+                  placeholder="Enter note title"
                   className="bg-white/5 border-white/20 text-white"
                 />
+              </div>
+
+              <div>
+                <Label className="text-white">Category</Label>
+                <select
+                  value={newNoteCategory}
+                  onChange={(e) => setNewNoteCategory(e.target.value)}
+                  className="w-full p-3 glassmorphism rounded-lg bg-white/5 border-white/20 text-white"
+                >
+                  {categories.slice(1).map((category) => (
+                    <option key={category} value={category} className="bg-slate-800">
+                      {category}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
                 <Label className="text-white">Tags (comma separated)</Label>
                 <Input
-                  value={uploadTags}
-                  onChange={(e) => setUploadTags(e.target.value)}
-                  placeholder="e.g., study, notes, research"
+                  value={newNoteTags}
+                  onChange={(e) => setNewNoteTags(e.target.value)}
+                  placeholder="e.g., calculus, derivatives, math"
                   className="bg-white/5 border-white/20 text-white"
                 />
               </div>
 
-              <div className="flex items-center space-x-2">
-                <Switch
-                  checked={isPublic}
-                  onCheckedChange={setIsPublic}
-                  id="public-switch"
-                />
-                <Label htmlFor="public-switch" className="text-white">
-                  Make document public (shareable)
-                </Label>
-              </div>
-
               <div className="flex space-x-2">
                 <Button
-                  onClick={() => setShowUploadDialog(false)}
+                  onClick={() => setShowNewNoteDialog(false)}
                   variant="outline"
                   className="flex-1"
                 >
                   Cancel
                 </Button>
                 <Button
-                  onClick={handleFileUpload}
-                  disabled={!selectedFile || uploadMutation.isPending}
+                  onClick={handleCreateNote}
                   className="flex-1 bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600"
                 >
-                  {uploadMutation.isPending ? "Uploading..." : "Upload Document"}
+                  Create Note
                 </Button>
               </div>
             </div>

@@ -425,7 +425,7 @@ export default function RichTextEditor({ content = '', onUpdate, title = 'Untitl
         <EditorContent editor={editor} />
       </div>
 
-      <style jsx global>{`
+      <style>{`
         .ProseMirror {
           outline: none;
         }
