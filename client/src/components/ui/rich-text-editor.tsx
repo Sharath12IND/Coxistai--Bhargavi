@@ -493,12 +493,8 @@ export default function RichTextEditor({ content = '', onUpdate, title = 'Untitl
           text-decoration: underline;
         }
         
-        .ProseMirror [style*="font-size"] {
-          font-size: var(--font-size) !important;
-        }
-        
         .ProseMirror span[style*="font-size"] {
-          display: inline;
+          display: inline !important;
         }
       `}</style>
     </div>
