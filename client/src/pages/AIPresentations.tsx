@@ -20,7 +20,8 @@ import {
   EyeOff,
   ChevronLeft,
   ChevronRight,
-  Play
+  Play,
+  X
 } from "lucide-react";
 import GlassmorphismButton from "@/components/ui/glassmorphism-button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -364,10 +365,10 @@ const AIPresentations = () => {
           </motion.p>
           
           {/* Quick Actions */}
-          <div className="flex justify-center space-x-4 mb-8">
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
             <GlassmorphismButton
               onClick={() => setShowGenerateDialog(true)}
-              className="bg-gradient-to-r from-blue-500 to-green-500"
+              className="bg-gradient-to-r from-blue-500 to-green-500 px-6 py-3"
             >
               <Wand2 className="w-4 h-4 mr-2" />
               Generate with AI
@@ -375,21 +376,116 @@ const AIPresentations = () => {
             <GlassmorphismButton
               onClick={() => setShowExportDialog(true)}
               variant="outline"
+              className="px-6 py-3"
             >
               <Download className="w-4 h-4 mr-2" />
-              Export Presentation
+              Export
             </GlassmorphismButton>
             <GlassmorphismButton
               onClick={() => setIsPreviewMode(!isPreviewMode)}
               variant="outline"
+              className="px-6 py-3"
             >
               {isPreviewMode ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
-              {isPreviewMode ? "Exit Preview" : "Preview Mode"}
+              {isPreviewMode ? "Exit Fullscreen" : "Fullscreen Preview"}
             </GlassmorphismButton>
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        {/* Fullscreen Preview Mode */}
+        {isPreviewMode && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black flex items-center justify-center"
+          >
+            <button
+              onClick={() => setIsPreviewMode(false)}
+              className="absolute top-4 right-4 z-60 p-3 glassmorphism rounded-lg text-white hover:bg-white/20 transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            
+            <div className="w-full h-full max-w-7xl max-h-4xl flex items-center justify-center p-8">
+              <div 
+                className={`w-full h-full ${
+                  currentSlide.backgroundStyle === 'gradient' 
+                    ? `bg-gradient-to-br ${currentSlide.backgroundGradient}` 
+                    : currentSlide.backgroundGradient
+                } rounded-2xl p-12 text-white flex flex-col justify-center overflow-hidden shadow-2xl`}
+              >
+                <div className="text-center space-y-8">
+                  <h1 className="text-6xl font-bold leading-tight">{currentSlide.title}</h1>
+                  <h2 className="text-3xl opacity-90">{currentSlide.subtitle}</h2>
+                  
+                  {currentSlide.content && (
+                    <p className="text-2xl opacity-80 max-w-5xl mx-auto leading-relaxed">
+                      {currentSlide.content}
+                    </p>
+                  )}
+                  
+                  {currentSlide.bulletPoints.length > 0 && (
+                    <div className="space-y-4 text-left max-w-4xl mx-auto">
+                      {currentSlide.bulletPoints.map((point, index) => (
+                        <motion.div
+                          key={index}
+                          className="flex items-start space-x-4"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.2 }}
+                        >
+                          <div className="w-3 h-3 bg-white rounded-full mt-4 flex-shrink-0"></div>
+                          <span className="text-2xl">{point}</span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {currentSlide.images.length > 0 && (
+                    <div className="flex justify-center space-x-6 mt-8">
+                      {currentSlide.images.map((image, index) => (
+                        <img
+                          key={index}
+                          src={image}
+                          alt={`Slide image ${index + 1}`}
+                          className="max-w-lg max-h-80 object-cover rounded-xl shadow-2xl"
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            {/* Navigation in fullscreen */}
+            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                size="lg"
+                onClick={prevSlide}
+                disabled={currentSlideIndex === 0}
+                className="glassmorphism text-white hover:bg-white/20"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </Button>
+              <span className="text-white bg-black/50 px-4 py-2 rounded-lg">
+                {currentSlideIndex + 1} / {slides.length}
+              </span>
+              <Button
+                variant="ghost"
+                size="lg"
+                onClick={nextSlide}
+                disabled={currentSlideIndex === slides.length - 1}
+                className="glassmorphism text-white hover:bg-white/20"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </Button>
+            </div>
+          </motion.div>
+        )}
+
+        <div className={`grid lg:grid-cols-3 gap-8 ${isPreviewMode ? 'hidden' : ''}`}>
           {/* Slide Preview */}
           <div className="lg:col-span-2">
             <motion.div 
@@ -557,12 +653,22 @@ const AIPresentations = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold">Edit Slide</h2>
-                <GlassmorphismButton size="sm" onClick={enhanceWithAI}>
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  AI Enhance
-                </GlassmorphismButton>
+                <div className="flex space-x-2">
+                  <GlassmorphismButton 
+                    size="sm" 
+                    onClick={() => setShowGenerateDialog(true)}
+                    className="bg-gradient-to-r from-blue-500 to-green-500"
+                  >
+                    <Wand2 className="w-4 h-4 mr-2" />
+                    Generate
+                  </GlassmorphismButton>
+                  <GlassmorphismButton size="sm" onClick={enhanceWithAI} variant="outline">
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Enhance
+                  </GlassmorphismButton>
+                </div>
               </div>
 
               {/* Content Form */}
@@ -628,30 +734,39 @@ const AIPresentations = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="grid grid-cols-2 gap-3">
-                  <GlassmorphismButton
-                    variant="outline"
-                    onClick={() => setShowImageDialog(true)}
-                    className="w-full"
-                  >
-                    <ImageIcon className="w-4 h-4 mr-2" />
-                    Add Image
-                  </GlassmorphismButton>
-                  <GlassmorphismButton
-                    variant="outline"
-                    onClick={() => setShowChartDialog(true)}
-                    className="w-full"
-                  >
-                    <BarChart className="w-4 h-4 mr-2" />
-                    Add Chart
-                  </GlassmorphismButton>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <GlassmorphismButton
+                      variant="outline"
+                      onClick={() => setShowImageDialog(true)}
+                      className="w-full h-12 flex items-center justify-center"
+                    >
+                      <ImageIcon className="w-4 h-4 mr-2" />
+                      Add Image
+                    </GlassmorphismButton>
+                    <GlassmorphismButton
+                      variant="outline"
+                      onClick={() => setShowChartDialog(true)}
+                      className="w-full h-12 flex items-center justify-center"
+                    >
+                      <BarChart className="w-4 h-4 mr-2" />
+                      Add Chart
+                    </GlassmorphismButton>
+                  </div>
                   <GlassmorphismButton
                     variant="outline"
                     onClick={() => setShowBackgroundDialog(true)}
-                    className="w-full col-span-2"
+                    className="w-full h-12 flex items-center justify-center"
                   >
                     <Palette className="w-4 h-4 mr-2" />
                     Change Background
+                  </GlassmorphismButton>
+                  <GlassmorphismButton
+                    onClick={() => setIsPreviewMode(true)}
+                    className="w-full h-12 flex items-center justify-center bg-gradient-to-r from-green-500 to-blue-500"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Preview Fullscreen
                   </GlassmorphismButton>
                 </div>
               </div>
