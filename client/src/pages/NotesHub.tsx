@@ -290,65 +290,136 @@ const NotesHub = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
             >
-              {/* Editor Header */}
-              <div className="border-b border-white/10 p-4 flex items-center justify-between">
-                <div>
-                  <h3 className="font-bold text-lg text-white">{selectedNote.title}</h3>
-                  <p className="text-sm text-slate-400">
-                    {selectedNote.tags.join(' • ')}
-                  </p>
+              {selectedDocument ? (
+                <>
+                  {/* Document Header */}
+                  <div className="border-b border-white/10 p-4 flex items-center justify-between">
+                    <div>
+                      <h3 className="font-bold text-lg text-white">{selectedDocument.title}</h3>
+                      <p className="text-sm text-slate-400">
+                        {selectedDocument.fileType} • {formatDate(selectedDocument.createdAt as string)}
+                      </p>
+                    </div>
+                    <div className="flex space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleShare(selectedDocument)}
+                        className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                      >
+                        <Share className="w-5 h-5" />
+                      </Button>
+                      <GlassmorphismButton size="sm">
+                        <Download className="w-4 h-4 inline mr-2" />
+                        Download
+                      </GlassmorphismButton>
+                    </div>
+                  </div>
+                  
+                  {/* Document Content */}
+                  <div className="p-6 min-h-[400px] text-white">
+                    <div className="prose prose-invert max-w-none">
+                      <h1 className="text-2xl font-bold mb-4">{selectedDocument.title}</h1>
+                      {selectedDocument.tags && selectedDocument.tags.length > 0 && (
+                        <div className="flex space-x-2 mb-6">
+                          {selectedDocument.tags.map((tag: string) => (
+                            <span 
+                              key={tag}
+                              className="px-3 py-1 rounded-full text-sm bg-blue-500/20 text-blue-400"
+                            >
+                              <Tag className="w-3 h-3 inline mr-1" />
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      <div className="whitespace-pre-wrap text-slate-200 leading-relaxed">
+                        {selectedDocument.content || "No content available for this document."}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center justify-center h-96 text-slate-400">
+                  <div className="text-center">
+                    <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                    <h3 className="text-xl font-semibold mb-2">No Document Selected</h3>
+                    <p>Select a document from the library or upload a new one to get started.</p>
+                  </div>
                 </div>
-                <div className="flex space-x-2">
-                  <button className="p-2 hover:bg-white/10 rounded-lg transition-colors">
-                    <Share className="w-5 h-5" />
-                  </button>
-                  <GlassmorphismButton size="sm" className="relative group">
-                    <Download className="w-4 h-4 inline mr-2" />
-                    Export PDF
-                    <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-slate-800 text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                      Premium Feature
-                    </span>
-                  </GlassmorphismButton>
-                </div>
-              </div>
-              
-              {/* Editor Toolbar */}
-              <div className="border-b border-white/10 p-3 flex items-center space-x-3 flex-wrap">
-                <button className="p-2 hover:bg-white/10 rounded transition-colors">
-                  <Bold className="w-4 h-4" />
-                </button>
-                <button className="p-2 hover:bg-white/10 rounded transition-colors">
-                  <Italic className="w-4 h-4" />
-                </button>
-                <button className="p-2 hover:bg-white/10 rounded transition-colors">
-                  <Underline className="w-4 h-4" />
-                </button>
-                <div className="w-px h-6 bg-white/20"></div>
-                <button className="p-2 hover:bg-white/10 rounded transition-colors">
-                  <List className="w-4 h-4" />
-                </button>
-                <button className="p-2 hover:bg-white/10 rounded transition-colors">
-                  <ListOrdered className="w-4 h-4" />
-                </button>
-                <div className="w-px h-6 bg-white/20"></div>
-                <button className="p-2 hover:bg-white/10 rounded transition-colors">
-                  <Image className="w-4 h-4" />
-                </button>
-                <button className="p-2 hover:bg-white/10 rounded transition-colors">
-                  <Link className="w-4 h-4" />
-                </button>
-              </div>
-              
-              {/* Editor Content */}
-              <div className="p-6 min-h-[400px] text-white">
-                <div className="prose prose-invert max-w-none">
-                  <h1 className="text-2xl font-bold mb-4">{selectedNote.title}</h1>
-                  <div dangerouslySetInnerHTML={{ __html: selectedNote.content.replace(/\n/g, '<br />') }} />
-                </div>
-              </div>
+              )}
             </motion.div>
           </div>
         </div>
+
+        {/* Upload Dialog */}
+        <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
+          <DialogContent className="bg-slate-900 border-white/20">
+            <DialogHeader>
+              <DialogTitle className="text-white">Upload Document</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label className="text-white">File</Label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                  className="w-full p-3 glassmorphism rounded-lg bg-white/5 border-white/20 text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600"
+                  accept=".pdf,.txt,.doc,.docx"
+                />
+              </div>
+              
+              <div>
+                <Label className="text-white">Title (Optional)</Label>
+                <Input
+                  value={uploadTitle}
+                  onChange={(e) => setUploadTitle(e.target.value)}
+                  placeholder="Custom title for your document"
+                  className="bg-white/5 border-white/20 text-white"
+                />
+              </div>
+
+              <div>
+                <Label className="text-white">Tags (comma separated)</Label>
+                <Input
+                  value={uploadTags}
+                  onChange={(e) => setUploadTags(e.target.value)}
+                  placeholder="e.g., study, notes, research"
+                  className="bg-white/5 border-white/20 text-white"
+                />
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  checked={isPublic}
+                  onCheckedChange={setIsPublic}
+                  id="public-switch"
+                />
+                <Label htmlFor="public-switch" className="text-white">
+                  Make document public (shareable)
+                </Label>
+              </div>
+
+              <div className="flex space-x-2">
+                <Button
+                  onClick={() => setShowUploadDialog(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleFileUpload}
+                  disabled={!selectedFile || uploadMutation.isPending}
+                  className="flex-1 bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600"
+                >
+                  {uploadMutation.isPending ? "Uploading..." : "Upload Document"}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </main>
   );
