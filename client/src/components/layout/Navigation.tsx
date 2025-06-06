@@ -108,15 +108,25 @@ const Navigation = () => {
                 </div>
               ))}
               
-              {/* CTA Button */}
-              <motion.button
-                className="ml-4 glassmorphism-button px-6 py-3 rounded-xl font-semibold"
-                onClick={() => handleNavigation('/chat')}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Get Started
-              </motion.button>
+              {/* Auth Buttons */}
+              <div className="ml-4 flex items-center space-x-3">
+                <motion.button
+                  className="px-4 py-2 text-white hover:text-blue-400 transition-colors"
+                  onClick={() => handleNavigation('/login')}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Login
+                </motion.button>
+                <motion.button
+                  className="glassmorphism-button px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-blue-500 to-green-500"
+                  onClick={() => handleNavigation('/signup')}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Sign Up
+                </motion.button>
+              </div>
             </div>
             
             {/* Mobile Menu Button */}
@@ -195,12 +205,20 @@ const Navigation = () => {
                     )}
                   </div>
                 ))}
-                <button
-                  className="w-full glassmorphism-button px-4 py-3 rounded-lg font-semibold mt-4"
-                  onClick={() => handleNavigation('/chat')}
-                >
-                  Get Started
-                </button>
+                <div className="flex space-x-2 mt-4">
+                  <button
+                    className="flex-1 px-4 py-3 rounded-lg font-semibold text-white border border-white/20 hover:bg-white/10 transition-colors"
+                    onClick={() => handleNavigation('/login')}
+                  >
+                    Login
+                  </button>
+                  <button
+                    className="flex-1 glassmorphism-button px-4 py-3 rounded-lg font-semibold bg-gradient-to-r from-blue-500 to-green-500"
+                    onClick={() => handleNavigation('/signup')}
+                  >
+                    Sign Up
+                  </button>
+                </div>
               </div>
             </motion.div>
           )}
