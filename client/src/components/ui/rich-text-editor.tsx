@@ -22,7 +22,11 @@ import {
   Link as LinkIcon,
   Palette,
   Type,
-  Download
+  Download,
+  Heading1,
+  Heading2,
+  Heading3,
+  ChevronDown
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -67,6 +71,13 @@ const fontSizes = [
   '48px'
 ]
 
+const textFormats = [
+  { label: 'Body', value: 'paragraph', icon: null },
+  { label: 'Title', value: 'heading', level: 1, icon: Heading1 },
+  { label: 'Heading', value: 'heading', level: 2, icon: Heading2 },
+  { label: 'Subheading', value: 'heading', level: 3, icon: Heading3 },
+]
+
 const colors = [
   '#000000', '#FFFFFF', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF',
   '#FFA500', '#800080', '#FFC0CB', '#A52A2A', '#808080', '#000080', '#008000', '#800000'
@@ -84,14 +95,8 @@ export default function RichTextEditor({ content = '', onUpdate, title = 'Untitl
         orderedList: false,
         listItem: false,
       }),
-      TextStyle.configure({
-        HTMLAttributes: {
-          style: 'font-size: inherit',
-        },
-      }),
-      FontFamily.configure({
-        types: ['textStyle'],
-      }),
+      TextStyle,
+      FontFamily,
       Color.configure({
         types: ['textStyle'],
       }),
@@ -136,8 +141,39 @@ export default function RichTextEditor({ content = '', onUpdate, title = 'Untitl
 
   const setFontSize = useCallback((fontSize: string) => {
     if (editor) {
-      editor.chain().focus().setMark('textStyle', { fontSize: fontSize }).run()
+      const selection = editor.state.selection
+      if (selection.empty) {
+        // If no text is selected, set the mark for future typing
+        editor.chain().focus().setMark('textStyle', { fontSize }).run()
+      } else {
+        // If text is selected, apply the font size to the selection
+        editor.chain().focus().setMark('textStyle', { fontSize }).run()
+      }
     }
+  }, [editor])
+
+  const setTextFormat = useCallback((format: any) => {
+    if (!editor) return
+    
+    if (format.value === 'paragraph') {
+      editor.chain().focus().setParagraph().run()
+    } else if (format.value === 'heading') {
+      editor.chain().focus().setHeading({ level: format.level }).run()
+    }
+  }, [editor])
+
+  const getCurrentFormat = useCallback(() => {
+    if (!editor) return textFormats[0]
+    
+    if (editor.isActive('heading', { level: 1 })) {
+      return textFormats.find(f => f.level === 1) || textFormats[0]
+    } else if (editor.isActive('heading', { level: 2 })) {
+      return textFormats.find(f => f.level === 2) || textFormats[0]
+    } else if (editor.isActive('heading', { level: 3 })) {
+      return textFormats.find(f => f.level === 3) || textFormats[0]
+    }
+    
+    return textFormats[0] // Body/paragraph
   }, [editor])
 
   const setColor = useCallback((color: string) => {
@@ -342,6 +378,26 @@ export default function RichTextEditor({ content = '', onUpdate, title = 'Untitl
 
         {/* Second Row - Font and Color Controls */}
         <div className="flex items-center gap-2 flex-wrap">
+          <Select onValueChange={(value) => {
+            const format = textFormats.find(f => f.label === value)
+            if (format) setTextFormat(format)
+          }}>
+            <SelectTrigger className="w-36 bg-white/5 border-white/20 text-white">
+              <ChevronDown className="w-4 h-4 mr-2" />
+              <SelectValue placeholder={getCurrentFormat().label} />
+            </SelectTrigger>
+            <SelectContent className="bg-slate-800 border-white/20">
+              {textFormats.map((format) => (
+                <SelectItem key={format.label} value={format.label} className="text-white hover:bg-white/10">
+                  <div className="flex items-center">
+                    {format.icon && <format.icon className="w-4 h-4 mr-2" />}
+                    {format.label}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           <Select onValueChange={setFontFamily}>
             <SelectTrigger className="w-40 bg-white/5 border-white/20 text-white">
               <Type className="w-4 h-4 mr-2" />
