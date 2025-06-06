@@ -84,7 +84,11 @@ export default function RichTextEditor({ content = '', onUpdate, title = 'Untitl
         orderedList: false,
         listItem: false,
       }),
-      TextStyle,
+      TextStyle.configure({
+        HTMLAttributes: {
+          style: 'font-size: inherit',
+        },
+      }),
       FontFamily.configure({
         types: ['textStyle'],
       }),
@@ -132,7 +136,7 @@ export default function RichTextEditor({ content = '', onUpdate, title = 'Untitl
 
   const setFontSize = useCallback((fontSize: string) => {
     if (editor) {
-      editor.chain().focus().setMark('textStyle', { fontSize }).run()
+      editor.chain().focus().setMark('textStyle', { fontSize: fontSize }).run()
     }
   }, [editor])
 
@@ -487,6 +491,14 @@ export default function RichTextEditor({ content = '', onUpdate, title = 'Untitl
         
         .ProseMirror u {
           text-decoration: underline;
+        }
+        
+        .ProseMirror [style*="font-size"] {
+          font-size: var(--font-size) !important;
+        }
+        
+        .ProseMirror span[style*="font-size"] {
+          display: inline;
         }
       `}</style>
     </div>
