@@ -8,11 +8,17 @@ import {
   User,
   X,
   FileText,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Plus,
+  MessageSquare,
+  Trash2,
+  Menu,
+  Search
 } from "lucide-react";
 import GlassmorphismButton from "@/components/ui/glassmorphism-button";
 import FileUpload from "@/components/ui/file-upload";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 interface UploadedFile {
   file: File;
@@ -28,15 +34,41 @@ interface Message {
   attachedFiles?: UploadedFile[];
 }
 
+interface ChatSession {
+  id: string;
+  title: string;
+  messages: Message[];
+  createdAt: string;
+  lastUpdated: string;
+}
+
 const SparkTutorChat = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
+  // Chat sessions state
+  const [chatSessions, setChatSessions] = useState<ChatSession[]>(() => {
+    const saved = localStorage.getItem('sparktutor-sessions');
+    return saved ? JSON.parse(saved) : [];
+  });
+  
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(() => {
+    const saved = localStorage.getItem('sparktutor-current-session');
+    return saved || null;
+  });
+
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Current chat state
+  const currentSession = chatSessions.find(s => s.id === currentSessionId);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (currentSession) return currentSession.messages;
+    return [{
       id: "1",
       content: "Hello! I'm SparkTutor, your AI learning assistant. I can help you with homework, explain concepts, solve problems, and much more. You can also upload files for me to analyze! How can I assist you today?",
       isAI: true,
-      timestamp: "10:30 AM"
-    }
-  ]);
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }];
+  });
+
   const [inputValue, setInputValue] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<UploadedFile[]>([]);
   const [showFileDialog, setShowFileDialog] = useState(false);
@@ -46,9 +78,100 @@ const SparkTutorChat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Save to localStorage whenever sessions change
+  useEffect(() => {
+    localStorage.setItem('sparktutor-sessions', JSON.stringify(chatSessions));
+  }, [chatSessions]);
+
+  useEffect(() => {
+    if (currentSessionId) {
+      localStorage.setItem('sparktutor-current-session', currentSessionId);
+    }
+  }, [currentSessionId]);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Update current session messages when messages change
+  useEffect(() => {
+    if (currentSessionId && messages.length > 0) {
+      setChatSessions(sessions => 
+        sessions.map(session => 
+          session.id === currentSessionId 
+            ? { ...session, messages, lastUpdated: new Date().toISOString() }
+            : session
+        )
+      );
+    }
+  }, [messages, currentSessionId]);
+
+  // Chat session management functions
+  const createNewChat = () => {
+    const newSession: ChatSession = {
+      id: Date.now().toString(),
+      title: "New Chat",
+      messages: [{
+        id: "1",
+        content: "Hello! I'm SparkTutor, your AI learning assistant. I can help you with homework, explain concepts, solve problems, and much more. You can also upload files for me to analyze! How can I assist you today?",
+        isAI: true,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }],
+      createdAt: new Date().toISOString(),
+      lastUpdated: new Date().toISOString()
+    };
+
+    setChatSessions(prev => [newSession, ...prev]);
+    setCurrentSessionId(newSession.id);
+    setMessages(newSession.messages);
+    setSidebarOpen(false);
+  };
+
+  const switchToSession = (sessionId: string) => {
+    const session = chatSessions.find(s => s.id === sessionId);
+    if (session) {
+      setCurrentSessionId(sessionId);
+      setMessages(session.messages);
+      setSidebarOpen(false);
+    }
+  };
+
+  const deleteSession = (sessionId: string) => {
+    setChatSessions(prev => prev.filter(s => s.id !== sessionId));
+    if (currentSessionId === sessionId) {
+      const remaining = chatSessions.filter(s => s.id !== sessionId);
+      if (remaining.length > 0) {
+        switchToSession(remaining[0].id);
+      } else {
+        createNewChat();
+      }
+    }
+  };
+
+  const updateSessionTitle = (sessionId: string, newTitle: string) => {
+    setChatSessions(prev => 
+      prev.map(session => 
+        session.id === sessionId 
+          ? { ...session, title: newTitle }
+          : session
+      )
+    );
+  };
+
+  // Auto-generate title from first user message
+  const generateTitle = (firstUserMessage: string) => {
+    return firstUserMessage.length > 50 
+      ? firstUserMessage.substring(0, 47) + "..."
+      : firstUserMessage;
+  };
+
+  // Filter sessions based on search
+  const filteredSessions = chatSessions.filter(session =>
+    session.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    session.messages.some(msg => 
+      msg.content.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
 
   const handleSendMessage = () => {
     if (!inputValue.trim() && attachedFiles.length === 0) return;
@@ -61,32 +184,69 @@ const SparkTutorChat = () => {
       attachedFiles: attachedFiles.length > 0 ? [...attachedFiles] : undefined
     };
 
+    // If this is the first user message and we're in a new chat, update the title
+    if (!currentSessionId || (currentSession && currentSession.title === "New Chat" && currentSession.messages.length === 1)) {
+      const title = generateTitle(userMessage.content);
+      if (currentSessionId) {
+        updateSessionTitle(currentSessionId, title);
+      } else {
+        // Create new session if none exists
+        const newSession: ChatSession = {
+          id: Date.now().toString(),
+          title,
+          messages: [{
+            id: "1",
+            content: "Hello! I'm SparkTutor, your AI learning assistant. I can help you with homework, explain concepts, solve problems, and much more. You can also upload files for me to analyze! How can I assist you today?",
+            isAI: true,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }, userMessage],
+          createdAt: new Date().toISOString(),
+          lastUpdated: new Date().toISOString()
+        };
+        setChatSessions(prev => [newSession, ...prev]);
+        setCurrentSessionId(newSession.id);
+        setMessages(newSession.messages);
+        setInputValue("");
+        setAttachedFiles([]);
+        
+        // Generate AI response
+        setTimeout(() => {
+          generateAIResponse(userMessage, newSession.messages);
+        }, 1000);
+        return;
+      }
+    }
+
     setMessages(prev => [...prev, userMessage]);
     setInputValue("");
     setAttachedFiles([]);
 
-    // Simulate AI response based on files
+    // Generate AI response
     setTimeout(() => {
-      let aiContent = "That's a great question! Let me help you understand this concept step by step.";
-      
-      if (userMessage.attachedFiles && userMessage.attachedFiles.length > 0) {
-        const fileTypes = userMessage.attachedFiles.map(f => f.type);
-        if (fileTypes.includes('image')) {
-          aiContent = "I can see the image you've uploaded! Based on what I observe, let me analyze this for you. The image appears to contain educational content that I can help explain step by step.";
-        } else if (fileTypes.includes('pdf') || fileTypes.includes('document')) {
-          aiContent = "I've analyzed the document you uploaded. Let me break down the key concepts and help you understand the material better. What specific part would you like me to focus on?";
-        }
-        aiContent += " Feel free to ask specific questions about any part of the content!";
-      }
-
-      const aiResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        content: aiContent,
-        isAI: true,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-      setMessages(prev => [...prev, aiResponse]);
+      generateAIResponse(userMessage, [...messages, userMessage]);
     }, 1000);
+  };
+
+  const generateAIResponse = (userMessage: Message, currentMessages: Message[]) => {
+    let aiContent = "That's a great question! Let me help you understand this concept step by step.";
+    
+    if (userMessage.attachedFiles && userMessage.attachedFiles.length > 0) {
+      const fileTypes = userMessage.attachedFiles.map(f => f.type);
+      if (fileTypes.includes('image')) {
+        aiContent = "I can see the image you've uploaded! Based on what I observe, let me analyze this for you. The image appears to contain educational content that I can help explain step by step.";
+      } else if (fileTypes.includes('pdf') || fileTypes.includes('document')) {
+        aiContent = "I've analyzed the document you uploaded. Let me break down the key concepts and help you understand the material better. What specific part would you like me to focus on?";
+      }
+      aiContent += " Feel free to ask specific questions about any part of the content!";
+    }
+
+    const aiResponse: Message = {
+      id: (Date.now() + 1).toString(),
+      content: aiContent,
+      isAI: true,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    setMessages(prev => [...prev, aiResponse]);
   };
 
   const handleFilesChange = (files: UploadedFile[]) => {
@@ -115,48 +275,148 @@ const SparkTutorChat = () => {
 
   return (
     <main className="relative z-10 pt-20">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <motion.h1 
-            className="text-4xl font-bold mb-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            SparkTutor Chat
-          </motion.h1>
-          <motion.p 
-            className="text-slate-400"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-          >
-            Your AI learning companion is here to help
-          </motion.p>
-        </div>
-        
-        <motion.div 
-          className="glassmorphism rounded-xl overflow-hidden h-[600px] flex flex-col"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-        >
-          {/* Chat Header */}
-          <div className="border-b border-white/10 p-4 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
+      <div className="flex h-screen bg-slate-900">
+        {/* Sidebar */}
+        <AnimatePresence>
+          {sidebarOpen && (
+            <motion.div
+              initial={{ x: -300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -300, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-y-0 left-0 w-80 bg-slate-800/95 backdrop-blur-xl border-r border-white/10 z-50 flex flex-col"
+            >
+              {/* Sidebar Header */}
+              <div className="p-4 border-b border-white/10">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold text-white">Chat History</h2>
+                  <button
+                    onClick={() => setSidebarOpen(false)}
+                    className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5 text-slate-400" />
+                  </button>
+                </div>
+                
+                <GlassmorphismButton
+                  onClick={createNewChat}
+                  className="w-full justify-start mb-4"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Chat
+                </GlassmorphismButton>
+
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Input
+                    placeholder="Search chats..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder-slate-400"
+                  />
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold">SparkTutor AI</h3>
-                <p className="text-sm text-slate-400">Online • Ready to help</p>
+
+              {/* Chat Sessions List */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                {filteredSessions.length === 0 ? (
+                  <div className="text-center text-slate-400 py-8">
+                    <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                    <p>No chats yet</p>
+                    <p className="text-sm">Start a new conversation!</p>
+                  </div>
+                ) : (
+                  filteredSessions.map((session) => (
+                    <motion.div
+                      key={session.id}
+                      className={`group relative p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                        currentSessionId === session.id
+                          ? 'bg-blue-500/20 border border-blue-500/30'
+                          : 'hover:bg-white/5'
+                      }`}
+                      onClick={() => switchToSession(session.id)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-white truncate text-sm">
+                            {session.title}
+                          </h3>
+                          <p className="text-xs text-slate-400 mt-1">
+                            {new Date(session.lastUpdated).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteSession(session.id);
+                          }}
+                          className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-500/20 rounded transition-all"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-400" />
+                        </button>
+                      </div>
+                    </motion.div>
+                  ))
+                )}
               </div>
-            </div>
-            <div className="flex space-x-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-xs text-slate-400">AI Ready</span>
-            </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Main Chat Area */}
+        <div className="flex-1 flex flex-col">
+          {/* Mobile Header */}
+          <div className="lg:hidden flex items-center justify-between p-4 border-b border-white/10">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+            >
+              <Menu className="w-6 h-6 text-white" />
+            </button>
+            <h1 className="text-xl font-bold text-white">SparkTutor Chat</h1>
+            <div className="w-10" />
           </div>
+
+          {/* Desktop Header */}
+          <div className="hidden lg:flex items-center justify-between p-6 border-b border-white/10">
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              >
+                <Menu className="w-6 h-6 text-white" />
+              </button>
+              <div>
+                <h1 className="text-2xl font-bold text-white">SparkTutor Chat</h1>
+                <p className="text-slate-400">Your AI learning companion is here to help</p>
+              </div>
+            </div>
+            <GlassmorphismButton onClick={createNewChat} variant="outline">
+              <Plus className="w-4 h-4 mr-2" />
+              New Chat
+            </GlassmorphismButton>
+          </div>
+
+          {/* Chat Messages Area */}
+          <div className="flex-1 flex flex-col bg-slate-900">
+            {/* Chat Header */}
+            <div className="border-b border-white/10 p-4 flex items-center justify-between bg-slate-800/50">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white">SparkTutor AI</h3>
+                  <p className="text-sm text-slate-400">Online • Ready to help</p>
+                </div>
+              </div>
+              <div className="flex space-x-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-xs text-slate-400">AI Ready</span>
+              </div>
+            </div>
           
           {/* Chat Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -311,7 +571,8 @@ const SparkTutorChat = () => {
               {attachedFiles.length > 0 && " • Files attached - ready to analyze!"}
             </p>
           </div>
-        </motion.div>
+          </div>
+        </div>
 
         {/* File Upload Dialog */}
         <Dialog open={showFileDialog} onOpenChange={setShowFileDialog}>
