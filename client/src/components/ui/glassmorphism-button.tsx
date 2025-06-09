@@ -1,11 +1,16 @@
 import { motion } from "framer-motion";
-import { ButtonHTMLAttributes, ReactNode } from "react";
+import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-interface GlassmorphismButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface GlassmorphismButtonProps {
   children: ReactNode;
   variant?: "default" | "outline";
   size?: "sm" | "md" | "lg";
+  className?: string;
+  onClick?: () => void;
+  disabled?: boolean;
+  title?: string;
+  type?: "button" | "submit" | "reset";
 }
 
 const GlassmorphismButton = ({ 
@@ -13,7 +18,10 @@ const GlassmorphismButton = ({
   className, 
   variant = "default", 
   size = "md",
-  ...props 
+  onClick,
+  disabled = false,
+  title,
+  type = "button"
 }: GlassmorphismButtonProps) => {
   const baseClasses = "font-semibold transition-all duration-300 border border-white/20 flex items-center justify-center";
   
@@ -27,20 +35,22 @@ const GlassmorphismButton = ({
     md: "px-4 py-2 text-sm rounded-lg",
     lg: "px-6 py-3 text-base rounded-xl"
   };
-
-  const { onAnimationStart, onAnimationEnd, ...buttonProps } = props;
   
   return (
     <motion.button
+      type={type}
+      onClick={onClick}
+      disabled={disabled}
+      title={title}
       className={cn(
         baseClasses,
         variants[variant],
         sizes[size],
+        disabled && "opacity-50 cursor-not-allowed",
         className
       )}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      {...buttonProps}
+      whileHover={disabled ? {} : { scale: 1.05 }}
+      whileTap={disabled ? {} : { scale: 0.95 }}
     >
       {children}
     </motion.button>
