@@ -277,8 +277,8 @@ const SparkTutorChat = () => {
   };
 
   return (
-    <main className="relative z-10 pt-20 h-screen">
-      <div className="flex h-full bg-slate-900">
+    <main className="relative z-10 h-screen">
+      <div className="flex h-full bg-slate-900 pt-20">
         {/* Sidebar */}
         <AnimatePresence>
           {sidebarOpen && (
@@ -288,7 +288,7 @@ const SparkTutorChat = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+                className="fixed top-20 inset-x-0 bottom-0 bg-black/50 z-40 lg:hidden"
                 onClick={() => setSidebarOpen(false)}
               />
               
@@ -297,7 +297,7 @@ const SparkTutorChat = () => {
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: -320, opacity: 0 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="fixed inset-y-0 left-0 w-80 bg-slate-800/98 backdrop-blur-xl border-r border-white/20 z-50 flex flex-col shadow-2xl"
+                className="fixed top-20 bottom-0 left-0 w-80 bg-slate-800/98 backdrop-blur-xl border-r border-white/20 z-50 flex flex-col shadow-2xl"
               >
                 {/* Sidebar Header */}
                 <div className="p-4 border-b border-white/10">
@@ -380,7 +380,7 @@ const SparkTutorChat = () => {
         </AnimatePresence>
 
         {/* Main Chat Container */}
-        <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? 'lg:ml-80 lg:mr-4' : ''}`}>
+        <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? 'lg:ml-80 lg:pl-4' : ''}`}>
           {/* Mobile Header */}
           <div className="lg:hidden flex items-center justify-between p-4 border-b border-white/10 bg-slate-800/50">
             <button
