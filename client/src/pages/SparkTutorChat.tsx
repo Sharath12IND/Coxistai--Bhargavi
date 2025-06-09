@@ -313,7 +313,7 @@ const SparkTutorChat = () => {
                   
                   <GlassmorphismButton
                     onClick={createNewChat}
-                    className="w-full justify-start mb-4"
+                    className="w-full mb-4"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     New Chat

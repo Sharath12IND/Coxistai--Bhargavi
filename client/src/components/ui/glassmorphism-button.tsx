@@ -15,7 +15,7 @@ const GlassmorphismButton = ({
   size = "md",
   ...props 
 }: GlassmorphismButtonProps) => {
-  const baseClasses = "font-semibold transition-all duration-300 border border-white/20";
+  const baseClasses = "font-semibold transition-all duration-300 border border-white/20 flex items-center justify-center";
   
   const variants = {
     default: "glassmorphism-button text-white",
@@ -28,6 +28,8 @@ const GlassmorphismButton = ({
     lg: "px-6 py-3 text-base rounded-xl"
   };
 
+  const { onAnimationStart, onAnimationEnd, ...buttonProps } = props;
+  
   return (
     <motion.button
       className={cn(
@@ -38,7 +40,7 @@ const GlassmorphismButton = ({
       )}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      {...props}
+      {...buttonProps}
     >
       {children}
     </motion.button>

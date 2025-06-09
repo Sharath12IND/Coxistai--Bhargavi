@@ -341,34 +341,34 @@ const SmartCalendar = () => {
               <div className="space-y-3">
                 <GlassmorphismButton
                   onClick={() => openEventDialog(new Date())}
-                  className="w-full justify-start text-left"
+                  className="w-full"
                 >
-                  <Plus className="w-4 h-4 mr-2 flex-shrink-0" />
-                  <span>Add Event</span>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Event
                 </GlassmorphismButton>
                 <GlassmorphismButton
                   onClick={() => openEventDialog(new Date(), undefined, 'study')}
                   variant="outline"
-                  className="w-full justify-start text-left"
+                  className="w-full"
                 >
-                  <Clock className="w-4 h-4 mr-2 flex-shrink-0" />
-                  <span>Schedule Study Session</span>
+                  <Clock className="w-4 h-4 mr-2" />
+                  Schedule Study Session
                 </GlassmorphismButton>
                 <GlassmorphismButton
                   onClick={() => openEventDialog(new Date(), undefined, 'group')}
                   variant="outline"
-                  className="w-full justify-start text-left"
+                  className="w-full"
                 >
-                  <Users className="w-4 h-4 mr-2 flex-shrink-0" />
-                  <span>Group Study</span>
+                  <Users className="w-4 h-4 mr-2" />
+                  Group Study
                 </GlassmorphismButton>
                 <GlassmorphismButton
                   onClick={navigateToToday}
                   variant="outline"
-                  className="w-full justify-start text-left"
+                  className="w-full"
                 >
-                  <CalendarIcon className="w-4 h-4 mr-2 flex-shrink-0" />
-                  <span>Go to Today</span>
+                  <CalendarIcon className="w-4 h-4 mr-2" />
+                  Go to Today
                 </GlassmorphismButton>
               </div>
             </motion.div>
@@ -474,16 +474,7 @@ const SmartCalendar = () => {
                 </div>
                 
                 <div className="flex items-center space-x-2">
-                  <Select value={selectedView} onValueChange={(value: any) => setSelectedView(value)}>
-                    <SelectTrigger className="w-32 bg-slate-700 border-slate-600 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-700">
-                      <SelectItem value="month">Month</SelectItem>
-                      <SelectItem value="week">Week</SelectItem>
-                      <SelectItem value="day">Day</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <span className="text-slate-400 text-sm">Month View</span>
                 </div>
               </div>
 
