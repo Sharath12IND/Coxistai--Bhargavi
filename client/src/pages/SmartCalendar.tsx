@@ -451,9 +451,20 @@ const SmartCalendar = () => {
                   >
                     <ChevronLeft className="w-5 h-5 text-white" />
                   </button>
-                  <h2 className="text-2xl font-bold text-white">
-                    {format(currentDate, 'MMMM yyyy')}
-                  </h2>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => setShowMonthSelector(true)}
+                      className="text-2xl font-bold text-white hover:text-blue-400 transition-colors"
+                    >
+                      {format(currentDate, 'MMMM')}
+                    </button>
+                    <button
+                      onClick={() => setShowYearSelector(true)}
+                      className="text-2xl font-bold text-white hover:text-blue-400 transition-colors"
+                    >
+                      {format(currentDate, 'yyyy')}
+                    </button>
+                  </div>
                   <button
                     onClick={() => navigateMonth('next')}
                     className="p-2 hover:bg-white/10 rounded-lg transition-colors"
@@ -549,6 +560,54 @@ const SmartCalendar = () => {
             </motion.div>
           </div>
         </div>
+
+        {/* Year Selector Dialog */}
+        <Dialog open={showYearSelector} onOpenChange={setShowYearSelector}>
+          <DialogContent className="max-w-md bg-slate-900 border-white/20">
+            <DialogHeader>
+              <DialogTitle className="text-white">Select Year</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-4 gap-2 mt-4 max-h-60 overflow-y-auto">
+              {getYearRange().map((year) => (
+                <button
+                  key={year}
+                  onClick={() => navigateToYear(year)}
+                  className={`p-2 rounded-lg text-sm transition-colors ${
+                    year === getYear(currentDate)
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                  }`}
+                >
+                  {year}
+                </button>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Month Selector Dialog */}
+        <Dialog open={showMonthSelector} onOpenChange={setShowMonthSelector}>
+          <DialogContent className="max-w-md bg-slate-900 border-white/20">
+            <DialogHeader>
+              <DialogTitle className="text-white">Select Month</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-3 gap-2 mt-4">
+              {months.map((month, index) => (
+                <button
+                  key={month}
+                  onClick={() => navigateToMonth(index)}
+                  className={`p-3 rounded-lg text-sm transition-colors ${
+                    index === getMonth(currentDate)
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                  }`}
+                >
+                  {month}
+                </button>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Event Dialog */}
         <Dialog open={showEventDialog} onOpenChange={setShowEventDialog}>
