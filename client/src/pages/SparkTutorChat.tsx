@@ -274,8 +274,8 @@ const SparkTutorChat = () => {
   };
 
   return (
-    <main className="relative z-10 pt-20">
-      <div className="flex h-screen bg-slate-900">
+    <main className="relative z-10 pt-20 h-screen">
+      <div className="flex h-full bg-slate-900">
         {/* Sidebar */}
         <AnimatePresence>
           {sidebarOpen && (
