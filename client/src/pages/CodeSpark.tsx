@@ -440,7 +440,7 @@ fruits.forEach(fruit => {
               <div className="p-6 border-b border-white/10">
                 <h3 className="text-lg font-semibold mb-4">Code Examples</h3>
                 <div className="grid grid-cols-2 gap-3">
-                  {Object.keys(codeExamples[selectedLanguage as keyof typeof codeExamples]).map((example) => (
+                  {Object.keys(codeExamples[selectedLanguage]).map((example) => (
                     <GlassmorphismButton
                       key={example}
                       variant="outline"
