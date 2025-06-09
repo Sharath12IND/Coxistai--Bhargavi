@@ -259,10 +259,13 @@ const SparkTutorChat = () => {
 
   const getFileIcon = (type: UploadedFile['type']) => {
     switch (type) {
-      case 'image': return <ImageIcon className="w-4 h-4" />;
-      case 'pdf': return <FileText className="w-4 h-4 text-red-400" />;
-      case 'document': return <FileText className="w-4 h-4 text-blue-400" />;
-      default: return <FileText className="w-4 h-4" />;
+      case 'image':
+        return <ImageIcon className="w-4 h-4 text-green-400" />;
+      case 'pdf':
+      case 'document':
+        return <FileText className="w-4 h-4 text-blue-400" />;
+      default:
+        return <FileText className="w-4 h-4 text-gray-400" />;
     }
   };
 
@@ -279,96 +282,107 @@ const SparkTutorChat = () => {
         {/* Sidebar */}
         <AnimatePresence>
           {sidebarOpen && (
-            <motion.div
-              initial={{ x: -300, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -300, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="fixed inset-y-0 left-0 w-80 bg-slate-800/95 backdrop-blur-xl border-r border-white/10 z-50 flex flex-col"
-            >
-              {/* Sidebar Header */}
-              <div className="p-4 border-b border-white/10">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold text-white">Chat History</h2>
-                  <button
-                    onClick={() => setSidebarOpen(false)}
-                    className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                  >
-                    <X className="w-5 h-5 text-slate-400" />
-                  </button>
-                </div>
-                
-                <GlassmorphismButton
-                  onClick={createNewChat}
-                  className="w-full justify-start mb-4"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  New Chat
-                </GlassmorphismButton>
-
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <Input
-                    placeholder="Search chats..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder-slate-400"
-                  />
-                </div>
-              </div>
-
-              {/* Chat Sessions List */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-2">
-                {filteredSessions.length === 0 ? (
-                  <div className="text-center text-slate-400 py-8">
-                    <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                    <p>No chats yet</p>
-                    <p className="text-sm">Start a new conversation!</p>
-                  </div>
-                ) : (
-                  filteredSessions.map((session) => (
-                    <motion.div
-                      key={session.id}
-                      className={`group relative p-3 rounded-lg cursor-pointer transition-all duration-200 ${
-                        currentSessionId === session.id
-                          ? 'bg-blue-500/20 border border-blue-500/30'
-                          : 'hover:bg-white/5'
-                      }`}
-                      onClick={() => switchToSession(session.id)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+            <>
+              {/* Overlay for mobile */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+                onClick={() => setSidebarOpen(false)}
+              />
+              
+              <motion.div
+                initial={{ x: -320, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -320, opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="fixed inset-y-0 left-0 w-80 bg-slate-800/98 backdrop-blur-xl border-r border-white/20 z-50 flex flex-col shadow-2xl"
+              >
+                {/* Sidebar Header */}
+                <div className="p-4 border-b border-white/10">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-bold text-white">Chat History</h2>
+                    <button
+                      onClick={() => setSidebarOpen(false)}
+                      className="p-2 hover:bg-white/10 rounded-lg transition-colors"
                     >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-white truncate text-sm">
-                            {session.title}
-                          </h3>
-                          <p className="text-xs text-slate-400 mt-1">
-                            {new Date(session.lastUpdated).toLocaleDateString()}
-                          </p>
+                      <X className="w-5 h-5 text-slate-400" />
+                    </button>
+                  </div>
+                  
+                  <GlassmorphismButton
+                    onClick={createNewChat}
+                    className="w-full justify-start mb-4"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    New Chat
+                  </GlassmorphismButton>
+
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Input
+                      placeholder="Search chats..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder-slate-400"
+                    />
+                  </div>
+                </div>
+
+                {/* Chat Sessions List */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                  {filteredSessions.length === 0 ? (
+                    <div className="text-center text-slate-400 py-8">
+                      <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <p>No chats yet</p>
+                      <p className="text-sm">Start a new conversation!</p>
+                    </div>
+                  ) : (
+                    filteredSessions.map((session) => (
+                      <motion.div
+                        key={session.id}
+                        className={`group relative p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                          currentSessionId === session.id
+                            ? 'bg-blue-500/20 border border-blue-500/30'
+                            : 'hover:bg-white/5'
+                        }`}
+                        onClick={() => switchToSession(session.id)}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium text-white truncate text-sm">
+                              {session.title}
+                            </h3>
+                            <p className="text-xs text-slate-400 mt-1">
+                              {new Date(session.lastUpdated).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteSession(session.id);
+                            }}
+                            className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-500/20 rounded transition-all"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-400" />
+                          </button>
                         </div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteSession(session.id);
-                          }}
-                          className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-500/20 rounded transition-all"
-                        >
-                          <Trash2 className="w-4 h-4 text-red-400" />
-                        </button>
-                      </div>
-                    </motion.div>
-                  ))
-                )}
-              </div>
-            </motion.div>
+                      </motion.div>
+                    ))
+                  )}
+                </div>
+              </motion.div>
+            </>
           )}
         </AnimatePresence>
 
-        {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col">
+        {/* Main Chat Container */}
+        <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? 'lg:ml-80 lg:mr-4' : ''}`}>
           {/* Mobile Header */}
-          <div className="lg:hidden flex items-center justify-between p-4 border-b border-white/10">
+          <div className="lg:hidden flex items-center justify-between p-4 border-b border-white/10 bg-slate-800/50">
             <button
               onClick={() => setSidebarOpen(true)}
               className="p-2 hover:bg-white/10 rounded-lg transition-colors"
@@ -380,10 +394,10 @@ const SparkTutorChat = () => {
           </div>
 
           {/* Desktop Header */}
-          <div className="hidden lg:flex items-center justify-between p-6 border-b border-white/10">
+          <div className="hidden lg:flex items-center justify-between p-6 border-b border-white/10 bg-slate-800/50">
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => setSidebarOpen(true)}
+                onClick={() => setSidebarOpen(!sidebarOpen)}
                 className="p-2 hover:bg-white/10 rounded-lg transition-colors"
               >
                 <Menu className="w-6 h-6 text-white" />
@@ -402,7 +416,7 @@ const SparkTutorChat = () => {
           {/* Chat Messages Area */}
           <div className="flex-1 flex flex-col bg-slate-900">
             {/* Chat Header */}
-            <div className="border-b border-white/10 p-4 flex items-center justify-between bg-slate-800/50">
+            <div className="border-b border-white/10 p-4 flex items-center justify-between bg-slate-800/30">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-white" />
@@ -417,160 +431,160 @@ const SparkTutorChat = () => {
                 <span className="text-xs text-slate-400">AI Ready</span>
               </div>
             </div>
-          
-          {/* Chat Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((message, index) => (
-              <motion.div
-                key={message.id}
-                className={`flex items-start space-x-3 ${message.isAI ? '' : 'justify-end'}`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                {message.isAI && (
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-4 h-4 text-white" />
-                  </div>
-                )}
-                
-                <div className={`max-w-lg p-3 rounded-lg ${
-                  message.isAI 
-                    ? 'glassmorphism rounded-tl-none' 
-                    : 'bg-blue-500 rounded-tr-none'
-                }`}>
-                  {/* Attached Files */}
-                  {message.attachedFiles && message.attachedFiles.length > 0 && (
-                    <div className="mb-3 space-y-2">
-                      {message.attachedFiles.map((file, fileIndex) => (
-                        <div
-                          key={fileIndex}
-                          className="flex items-center space-x-2 p-2 bg-white/10 rounded-lg"
-                        >
-                          {getFileIcon(file.type)}
-                          <span className="text-sm text-white truncate flex-1">
-                            {file.file.name}
-                          </span>
-                          {file.preview && (
-                            <img
-                              src={file.preview}
-                              alt={file.file.name}
-                              className="w-8 h-8 rounded object-cover"
-                            />
-                          )}
-                        </div>
-                      ))}
+            
+            {/* Chat Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.map((message, index) => (
+                <motion.div
+                  key={message.id}
+                  className={`flex items-start space-x-3 ${message.isAI ? '' : 'justify-end'}`}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  {message.isAI && (
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Sparkles className="w-4 h-4 text-white" />
                     </div>
                   )}
-                  <p className="text-white">{message.content}</p>
-                  <p className="text-xs text-slate-400 mt-2">{message.timestamp}</p>
-                </div>
-                
-                {!message.isAI && (
-                  <div className="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <User className="w-4 h-4 text-white" />
+                  
+                  <div className={`max-w-lg p-3 rounded-lg ${
+                    message.isAI 
+                      ? 'glassmorphism rounded-tl-none' 
+                      : 'bg-blue-500 rounded-tr-none'
+                  }`}>
+                    {/* Attached Files */}
+                    {message.attachedFiles && message.attachedFiles.length > 0 && (
+                      <div className="mb-3 space-y-2">
+                        {message.attachedFiles.map((file, fileIndex) => (
+                          <div
+                            key={fileIndex}
+                            className="flex items-center space-x-2 p-2 bg-white/10 rounded-lg"
+                          >
+                            {getFileIcon(file.type)}
+                            <span className="text-sm text-white truncate flex-1">
+                              {file.file.name}
+                            </span>
+                            {file.preview && (
+                              <img
+                                src={file.preview}
+                                alt={file.file.name}
+                                className="w-8 h-8 rounded object-cover"
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <p className="text-white">{message.content}</p>
+                    <p className="text-xs text-slate-400 mt-2">{message.timestamp}</p>
                   </div>
-                )}
-              </motion.div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-          
-          {/* Chat Input */}
-          <div className="border-t border-white/10 p-4">
-            {/* Attached Files Preview */}
-            <AnimatePresence>
-              {attachedFiles.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mb-3 p-3 glassmorphism rounded-lg"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-slate-300 font-medium">
-                      Attached Files ({attachedFiles.length})
-                    </span>
-                  </div>
-                  <div className="space-y-2">
-                    {attachedFiles.map((file, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="flex items-center justify-between p-2 bg-white/10 rounded-lg"
-                      >
-                        <div className="flex items-center space-x-2">
-                          {getFileIcon(file.type)}
-                          <span className="text-sm text-white truncate">
-                            {file.file.name}
-                          </span>
-                          {file.preview && (
-                            <img
-                              src={file.preview}
-                              alt={file.file.name}
-                              className="w-6 h-6 rounded object-cover"
-                            />
-                          )}
-                        </div>
-                        <button
-                          onClick={() => removeAttachedFile(index)}
-                          className="p-1 hover:bg-red-500/20 rounded text-red-400 hover:text-red-300"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </motion.div>
-                    ))}
-                  </div>
+                  
+                  {!message.isAI && (
+                    <div className="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <User className="w-4 h-4 text-white" />
+                    </div>
+                  )}
                 </motion.div>
-              )}
-            </AnimatePresence>
-
-            <div className="flex items-end space-x-3">
-              <div className="flex-1 glassmorphism rounded-xl p-3">
-                <textarea 
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder={attachedFiles.length > 0 ? "Ask a question about your files..." : "Ask me anything about your studies..."} 
-                  className="w-full bg-transparent resize-none outline-none placeholder-slate-400 text-white"
-                  rows={1}
-                />
-              </div>
-              <div className="flex space-x-2">
-                <GlassmorphismButton 
-                  size="sm" 
-                  variant="outline"
-                  className="p-3"
-                  title="Voice Input"
-                >
-                  <Mic className="w-5 h-5" />
-                </GlassmorphismButton>
-                <GlassmorphismButton 
-                  size="sm" 
-                  variant="outline"
-                  className="p-3"
-                  title="Attach File"
-                  onClick={() => setShowFileDialog(true)}
-                >
-                  <Paperclip className="w-5 h-5" />
-                </GlassmorphismButton>
-                <GlassmorphismButton 
-                  size="sm"
-                  className="p-3"
-                  onClick={handleSendMessage}
-                  title="Send Message"
-                  disabled={!inputValue.trim() && attachedFiles.length === 0}
-                >
-                  <Send className="w-5 h-5" />
-                </GlassmorphismButton>
-              </div>
+              ))}
+              <div ref={messagesEndRef} />
             </div>
-            <p className="text-xs text-slate-400 mt-2">
-              Max file size: 10MB • Supports images, PDFs, documents
-              {attachedFiles.length > 0 && " • Files attached - ready to analyze!"}
-            </p>
-          </div>
+            
+            {/* Chat Input */}
+            <div className="border-t border-white/10 p-4">
+              {/* Attached Files Preview */}
+              <AnimatePresence>
+                {attachedFiles.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mb-3 p-3 glassmorphism rounded-lg"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-slate-300 font-medium">
+                        Attached Files ({attachedFiles.length})
+                      </span>
+                    </div>
+                    <div className="space-y-2">
+                      {attachedFiles.map((file, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="flex items-center justify-between p-2 bg-white/10 rounded-lg"
+                        >
+                          <div className="flex items-center space-x-2">
+                            {getFileIcon(file.type)}
+                            <span className="text-sm text-white truncate">
+                              {file.file.name}
+                            </span>
+                            {file.preview && (
+                              <img
+                                src={file.preview}
+                                alt={file.file.name}
+                                className="w-6 h-6 rounded object-cover"
+                              />
+                            )}
+                          </div>
+                          <button
+                            onClick={() => removeAttachedFile(index)}
+                            className="p-1 hover:bg-red-500/20 rounded text-red-400 hover:text-red-300"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <div className="flex items-end space-x-3">
+                <div className="flex-1 glassmorphism rounded-xl p-3">
+                  <textarea 
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder={attachedFiles.length > 0 ? "Ask a question about your files..." : "Ask me anything about your studies..."} 
+                    className="w-full bg-transparent resize-none outline-none placeholder-slate-400 text-white"
+                    rows={1}
+                  />
+                </div>
+                <div className="flex space-x-2">
+                  <GlassmorphismButton 
+                    size="sm" 
+                    variant="outline"
+                    className="p-3"
+                    title="Voice Input"
+                  >
+                    <Mic className="w-5 h-5" />
+                  </GlassmorphismButton>
+                  <GlassmorphismButton 
+                    size="sm" 
+                    variant="outline"
+                    className="p-3"
+                    title="Attach File"
+                    onClick={() => setShowFileDialog(true)}
+                  >
+                    <Paperclip className="w-5 h-5" />
+                  </GlassmorphismButton>
+                  <GlassmorphismButton 
+                    size="sm"
+                    className="p-3"
+                    onClick={handleSendMessage}
+                    title="Send Message"
+                    disabled={!inputValue.trim() && attachedFiles.length === 0}
+                  >
+                    <Send className="w-5 h-5" />
+                  </GlassmorphismButton>
+                </div>
+              </div>
+              <p className="text-xs text-slate-400 mt-2">
+                Max file size: 10MB • Supports images, PDFs, documents
+                {attachedFiles.length > 0 && " • Files attached - ready to analyze!"}
+              </p>
+            </div>
           </div>
         </div>
 

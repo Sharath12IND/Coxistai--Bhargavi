@@ -52,6 +52,8 @@ const SmartCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showEventDialog, setShowEventDialog] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
+  const [showYearSelector, setShowYearSelector] = useState(false);
+  const [showMonthSelector, setShowMonthSelector] = useState(false);
   
   // Event and task storage (localStorage for now)
   const [events, setEvents] = useState<CalendarEvent[]>(() => {
@@ -165,8 +167,8 @@ const SmartCalendar = () => {
     setSelectedDate(null);
   };
 
-  // Open event dialog for specific date
-  const openEventDialog = (date: Date, event?: CalendarEvent) => {
+  // Open event dialog for specific date with optional event type preset
+  const openEventDialog = (date: Date, event?: CalendarEvent, eventType?: 'study' | 'exam' | 'assignment' | 'personal' | 'group') => {
     setSelectedDate(date);
     if (event) {
       setEditingEvent(event);
@@ -179,9 +181,58 @@ const SmartCalendar = () => {
         type: event.type,
         reminder: event.reminder
       });
+    } else if (eventType) {
+      // Pre-set the event type and title based on the button clicked
+      const typeDefaults = {
+        study: { title: 'Study Session', duration: 60 },
+        exam: { title: 'Exam', duration: 120 },
+        assignment: { title: 'Assignment Due', duration: 30 },
+        group: { title: 'Group Study', duration: 90 },
+        personal: { title: 'Personal Event', duration: 60 }
+      };
+      
+      setNewEvent({
+        title: typeDefaults[eventType].title,
+        description: '',
+        time: '09:00',
+        duration: typeDefaults[eventType].duration,
+        type: eventType,
+        color: eventColors[eventType],
+        reminder: 15
+      });
     }
     setShowEventDialog(true);
   };
+
+  // Year and month navigation
+  const navigateToYear = (year: number) => {
+    const newDate = new Date(currentDate);
+    newDate.setFullYear(year);
+    setCurrentDate(newDate);
+    setShowYearSelector(false);
+  };
+
+  const navigateToMonth = (month: number) => {
+    const newDate = new Date(currentDate);
+    newDate.setMonth(month);
+    setCurrentDate(newDate);
+    setShowMonthSelector(false);
+  };
+
+  // Generate year range for selector
+  const getYearRange = () => {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let i = currentYear - 10; i <= currentYear + 10; i++) {
+      years.push(i);
+    }
+    return years;
+  };
+
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
 
   // Toggle task completion
   const toggleTask = (taskId: string) => {
@@ -290,34 +341,34 @@ const SmartCalendar = () => {
               <div className="space-y-3">
                 <GlassmorphismButton
                   onClick={() => openEventDialog(new Date())}
-                  className="w-full justify-start"
+                  className="w-full justify-start text-left"
                 >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Event
+                  <Plus className="w-4 h-4 mr-2 flex-shrink-0" />
+                  <span>Add Event</span>
                 </GlassmorphismButton>
                 <GlassmorphismButton
-                  onClick={() => openEventDialog(new Date())}
+                  onClick={() => openEventDialog(new Date(), undefined, 'study')}
                   variant="outline"
-                  className="w-full justify-start"
+                  className="w-full justify-start text-left"
                 >
-                  <Clock className="w-4 h-4 mr-2" />
-                  Schedule Study Session
+                  <Clock className="w-4 h-4 mr-2 flex-shrink-0" />
+                  <span>Schedule Study Session</span>
                 </GlassmorphismButton>
                 <GlassmorphismButton
-                  onClick={() => openEventDialog(new Date())}
+                  onClick={() => openEventDialog(new Date(), undefined, 'group')}
                   variant="outline"
-                  className="w-full justify-start"
+                  className="w-full justify-start text-left"
                 >
-                  <Users className="w-4 h-4 mr-2" />
-                  Group Study
+                  <Users className="w-4 h-4 mr-2 flex-shrink-0" />
+                  <span>Group Study</span>
                 </GlassmorphismButton>
                 <GlassmorphismButton
                   onClick={navigateToToday}
                   variant="outline"
-                  className="w-full justify-start"
+                  className="w-full justify-start text-left"
                 >
-                  <CalendarIcon className="w-4 h-4 mr-2" />
-                  Go to Today
+                  <CalendarIcon className="w-4 h-4 mr-2 flex-shrink-0" />
+                  <span>Go to Today</span>
                 </GlassmorphismButton>
               </div>
             </motion.div>
