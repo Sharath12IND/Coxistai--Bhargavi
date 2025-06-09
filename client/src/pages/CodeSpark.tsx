@@ -30,6 +30,7 @@ const CodeSpark = () => {
   const [output, setOutput] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("python");
+  const [error, setError] = useState("");
   const [showAddCourseDialog, setShowAddCourseDialog] = useState(false);
   const [customCourse, setCustomCourse] = useState({ name: "", query: "" });
   const [searchQuery, setSearchQuery] = useState("");
@@ -173,51 +174,317 @@ const fruits = ["apple", "banana", "orange"];
 fruits.forEach(fruit => {
     console.log(\`I like \${fruit}\`);
 });`
+    },
+    c: {
+      "Hello World": `#include <stdio.h>
+
+int main() {
+    printf("Hello, World!\\n");
+    printf("Welcome to C!\\n");
+    return 0;
+}`,
+      "Variables": `#include <stdio.h>
+
+int main() {
+    char name[] = "Alice";
+    int age = 25;
+    float height = 5.7;
+    printf("Name: %s, Age: %d, Height: %.1f\\n", name, age, height);
+    return 0;
+}`,
+      "If Statement": `#include <stdio.h>
+
+int main() {
+    int age = 18;
+    if (age >= 18) {
+        printf("You can vote!\\n");
+    } else {
+        printf("Wait until you're 18\\n");
+    }
+    return 0;
+}`,
+      "For Loop": `#include <stdio.h>
+
+int main() {
+    for (int i = 0; i < 5; i++) {
+        printf("Count: %d\\n", i);
+    }
+    
+    char fruits[][10] = {"apple", "banana", "orange"};
+    for (int i = 0; i < 3; i++) {
+        printf("I like %s\\n", fruits[i]);
+    }
+    return 0;
+}`
+    },
+    cpp: {
+      "Hello World": `#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "Hello, World!" << endl;
+    cout << "Welcome to C++!" << endl;
+    return 0;
+}`,
+      "Variables": `#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string name = "Alice";
+    int age = 25;
+    float height = 5.7;
+    cout << "Name: " << name << ", Age: " << age << ", Height: " << height << endl;
+    return 0;
+}`,
+      "If Statement": `#include <iostream>
+using namespace std;
+
+int main() {
+    int age = 18;
+    if (age >= 18) {
+        cout << "You can vote!" << endl;
+    } else {
+        cout << "Wait until you're 18" << endl;
+    }
+    return 0;
+}`,
+      "For Loop": `#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+int main() {
+    for (int i = 0; i < 5; i++) {
+        cout << "Count: " << i << endl;
+    }
+    
+    vector<string> fruits = {"apple", "banana", "orange"};
+    for (const string& fruit : fruits) {
+        cout << "I like " << fruit << endl;
+    }
+    return 0;
+}`
+    },
+    java: {
+      "Hello World": `public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+        System.out.println("Welcome to Java!");
+    }
+}`,
+      "Variables": `public class Main {
+    public static void main(String[] args) {
+        String name = "Alice";
+        int age = 25;
+        double height = 5.7;
+        System.out.println("Name: " + name + ", Age: " + age + ", Height: " + height);
+    }
+}`,
+      "If Statement": `public class Main {
+    public static void main(String[] args) {
+        int age = 18;
+        if (age >= 18) {
+            System.out.println("You can vote!");
+        } else {
+            System.out.println("Wait until you're 18");
+        }
+    }
+}`,
+      "For Loop": `public class Main {
+    public static void main(String[] args) {
+        for (int i = 0; i < 5; i++) {
+            System.out.println("Count: " + i);
+        }
+        
+        String[] fruits = {"apple", "banana", "orange"};
+        for (String fruit : fruits) {
+            System.out.println("I like " + fruit);
+        }
+    }
+}`
     }
   };
 
-  // Code execution function (simulated for client-side)
+  // Syntax validation for different languages
+  const validateSyntax = (code: string, language: string): { isValid: boolean; error?: string } => {
+    try {
+      switch (language) {
+        case "python":
+          // Basic Python syntax checks
+          if (code.includes("print(") && !code.match(/print\([^)]*\)/)) {
+            return { isValid: false, error: "SyntaxError: Unclosed print statement" };
+          }
+          if (code.includes("if ") && !code.includes(":")) {
+            return { isValid: false, error: "SyntaxError: Invalid if statement - missing colon" };
+          }
+          break;
+        
+        case "javascript":
+          // Basic JavaScript syntax checks
+          if (code.includes("console.log(") && !code.match(/console\.log\([^)]*\)/)) {
+            return { isValid: false, error: "SyntaxError: Unclosed console.log statement" };
+          }
+          const openBraces = (code.match(/{/g) || []).length;
+          const closeBraces = (code.match(/}/g) || []).length;
+          if (openBraces !== closeBraces) {
+            return { isValid: false, error: "SyntaxError: Mismatched braces" };
+          }
+          break;
+        
+        case "c":
+          // Basic C syntax checks
+          if (!code.includes("#include") && !code.includes("int main")) {
+            return { isValid: false, error: "CompileError: Missing main function or includes" };
+          }
+          if (code.includes("printf(") && !code.match(/printf\([^)]*\)/)) {
+            return { isValid: false, error: "CompileError: Unclosed printf statement" };
+          }
+          if (code.includes("int main") && !code.includes("return 0;")) {
+            return { isValid: false, error: "CompileError: Main function must return 0" };
+          }
+          break;
+        
+        case "cpp":
+          // Basic C++ syntax checks
+          if (!code.includes("#include") && !code.includes("int main")) {
+            return { isValid: false, error: "CompileError: Missing main function or includes" };
+          }
+          if (code.includes("cout") && !code.includes("using namespace std") && !code.includes("std::cout")) {
+            return { isValid: false, error: "CompileError: cout requires 'using namespace std' or 'std::cout'" };
+          }
+          break;
+        
+        case "java":
+          // Basic Java syntax checks
+          if (!code.includes("public class") || !code.includes("public static void main")) {
+            return { isValid: false, error: "CompileError: Missing public class or main method" };
+          }
+          if (code.includes("System.out.println(") && !code.match(/System\.out\.println\([^)]*\)/)) {
+            return { isValid: false, error: "CompileError: Unclosed System.out.println statement" };
+          }
+          break;
+      }
+      return { isValid: true };
+    } catch (e) {
+      return { isValid: false, error: "Syntax validation error" };
+    }
+  };
+
+  // Enhanced code execution function with error handling
   const runCode = async () => {
     setIsRunning(true);
-    setOutput("Running...");
+    setOutput("Compiling and running...");
+    setError("");
     
-    // Simulate code execution
+    // Validate syntax first
+    const validation = validateSyntax(code, selectedLanguage);
+    if (!validation.isValid) {
+      setError(validation.error || "Syntax error detected");
+      setOutput("");
+      setIsRunning(false);
+      return;
+    }
+    
+    // Simulate compilation and execution
     setTimeout(() => {
       try {
-        if (selectedLanguage === "python") {
-          // Simple Python simulation
-          if (code.includes('print(')) {
-            const printMatches = code.match(/print\((.*?)\)/g);
-            if (printMatches) {
-              const outputs = printMatches.map(match => {
-                const content = match.replace(/print\(|\)/g, '').replace(/"/g, '').replace(/'/g, '');
-                return content;
-              });
-              setOutput(outputs.join('\n'));
+        let outputs: string[] = [];
+        
+        switch (selectedLanguage) {
+          case "python":
+            if (code.includes('print(')) {
+              const printMatches = code.match(/print\([^)]*\)/g);
+              if (printMatches) {
+                outputs = printMatches.map(match => {
+                  const content = match.replace(/print\(|\)/g, '').replace(/"/g, '').replace(/'/g, '').replace(/f"/g, '');
+                  // Handle f-strings
+                  if (content.includes('{') && content.includes('}')) {
+                    return content.replace(/{[^}]*}/g, '[variable]');
+                  }
+                  return content;
+                });
+              }
+            } else {
+              outputs = ["Program executed successfully"];
             }
-          } else {
-            setOutput("Code executed successfully");
-          }
-        } else if (selectedLanguage === "javascript") {
-          // Simple JavaScript simulation
-          if (code.includes('console.log(')) {
-            const logMatches = code.match(/console\.log\((.*?)\)/g);
-            if (logMatches) {
-              const outputs = logMatches.map(match => {
-                const content = match.replace(/console\.log\(|\)/g, '').replace(/"/g, '').replace(/'/g, '').replace(/`/g, '');
-                return content;
-              });
-              setOutput(outputs.join('\n'));
+            break;
+            
+          case "javascript":
+            if (code.includes('console.log(')) {
+              const logMatches = code.match(/console\.log\([^)]*\)/g);
+              if (logMatches) {
+                outputs = logMatches.map(match => {
+                  const content = match.replace(/console\.log\(|\)/g, '').replace(/"/g, '').replace(/'/g, '').replace(/`/g, '');
+                  // Handle template literals
+                  if (content.includes('${') && content.includes('}')) {
+                    return content.replace(/\$\{[^}]*\}/g, '[variable]');
+                  }
+                  return content;
+                });
+              }
+            } else {
+              outputs = ["Program executed successfully"];
             }
-          } else {
-            setOutput("Code executed successfully");
-          }
+            break;
+            
+          case "c":
+            if (code.includes('printf(')) {
+              const printfMatches = code.match(/printf\([^)]*\)/g);
+              if (printfMatches) {
+                outputs = printfMatches.map(match => {
+                  let content = match.replace(/printf\(|\)/g, '').replace(/"/g, '');
+                  content = content.replace(/\\n/g, '').replace(/%[sd]/g, '[variable]').replace(/%\.\d*f/g, '[variable]');
+                  return content;
+                });
+              }
+            } else {
+              outputs = ["Program compiled and executed successfully"];
+            }
+            break;
+            
+          case "cpp":
+            if (code.includes('cout')) {
+              const coutMatches = code.match(/cout\s*<<[^;]*;/g);
+              if (coutMatches) {
+                outputs = coutMatches.map(match => {
+                  let content = match.replace(/cout\s*<<\s*|\s*;\s*/g, '').replace(/"/g, '');
+                  content = content.replace(/endl/g, '').replace(/<<[^"]*$/g, '');
+                  return content.trim();
+                });
+              }
+            } else {
+              outputs = ["Program compiled and executed successfully"];
+            }
+            break;
+            
+          case "java":
+            if (code.includes('System.out.println(')) {
+              const printMatches = code.match(/System\.out\.println\([^)]*\)/g);
+              if (printMatches) {
+                outputs = printMatches.map(match => {
+                  let content = match.replace(/System\.out\.println\(|\)/g, '').replace(/"/g, '');
+                  content = content.replace(/\s*\+\s*[^"]*$/g, '[variable]');
+                  return content;
+                });
+              }
+            } else {
+              outputs = ["Program compiled and executed successfully"];
+            }
+            break;
+            
+          default:
+            outputs = ["Language not supported"];
         }
+        
+        setOutput(outputs.join('\n'));
+        setError("");
       } catch (error) {
-        setOutput("Error: " + error);
+        setError(`Runtime Error: An error occurred while executing the code. Please check your syntax and try again.`);
+        setOutput("");
       }
       setIsRunning(false);
-    }, 1000);
+    }, 1500); // Longer delay to simulate compilation
   };
 
   // Open YouTube course
@@ -429,6 +696,9 @@ fruits.forEach(fruit => {
                       <SelectContent className="bg-slate-800 border-slate-700">
                         <SelectItem value="python">Python</SelectItem>
                         <SelectItem value="javascript">JavaScript</SelectItem>
+                        <SelectItem value="c">C</SelectItem>
+                        <SelectItem value="cpp">C++</SelectItem>
+                        <SelectItem value="java">Java</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -473,10 +743,33 @@ fruits.forEach(fruit => {
                         size="sm" 
                         variant="outline"
                         onClick={() => {
-                          setCode(selectedLanguage === "python" ? `print("Hello, World!")
-# Write your Python code here` : `console.log("Hello, World!");
-// Write your JavaScript code here`);
+                          const defaultCode = {
+                            python: `print("Hello, World!")
+# Write your Python code here`,
+                            javascript: `console.log("Hello, World!");
+// Write your JavaScript code here`,
+                            c: `#include <stdio.h>
+
+int main() {
+    printf("Hello, World!\\n");
+    return 0;
+}`,
+                            cpp: `#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "Hello, World!" << endl;
+    return 0;
+}`,
+                            java: `public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}`
+                          };
+                          setCode(defaultCode[selectedLanguage as keyof typeof defaultCode] || defaultCode.python);
                           setOutput("");
+                          setError("");
                         }}
                       >
                         <RotateCcw className="w-3 h-3" />
@@ -488,21 +781,48 @@ fruits.forEach(fruit => {
                     onChange={(e) => setCode(e.target.value)}
                     className="w-full h-64 p-4 bg-slate-800 text-green-400 font-mono text-sm resize-none outline-none"
                     spellCheck={false}
-                    placeholder={selectedLanguage === "python" ? "# Write Python code here..." : "// Write JavaScript code here..."}
+                    placeholder={
+                      selectedLanguage === "python" ? "# Write Python code here..." :
+                      selectedLanguage === "javascript" ? "// Write JavaScript code here..." :
+                      selectedLanguage === "c" ? "// Write C code here..." :
+                      selectedLanguage === "cpp" ? "// Write C++ code here..." :
+                      selectedLanguage === "java" ? "// Write Java code here..." :
+                      "// Write your code here..."
+                    }
                   />
                 </div>
                 
-                {/* Output */}
-                <div className="mt-4">
+                {/* Output and Error Display */}
+                <div className="mt-4 space-y-3">
+                  {/* Error Display */}
+                  {error && (
+                    <div className="bg-red-900/20 border border-red-500/30 rounded-lg overflow-hidden">
+                      <div className="p-3 bg-red-800/30 border-b border-red-500/30">
+                        <span className="text-sm text-red-300 font-semibold">❌ Compilation Error</span>
+                      </div>
+                      <div className="p-4 font-mono text-sm">
+                        <pre className="text-red-400 whitespace-pre-wrap">{error}</pre>
+                        <div className="mt-2 text-xs text-red-300">
+                          Please check your code syntax and try again.
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Output Display */}
                   <div className="bg-slate-900 rounded-lg overflow-hidden">
                     <div className="p-3 bg-slate-800 border-b border-slate-700">
-                      <span className="text-sm text-slate-300">Output</span>
+                      <span className="text-sm text-slate-300">
+                        {error ? "⚠️ Output (Previous Run)" : "📤 Output"}
+                      </span>
                     </div>
                     <div className="p-4 min-h-[100px] font-mono text-sm">
                       {output ? (
                         <pre className="text-green-400 whitespace-pre-wrap">{output}</pre>
                       ) : (
-                        <span className="text-slate-500">Click "Run Code" to see output here...</span>
+                        <span className="text-slate-500">
+                          {error ? "Fix the error above and run again..." : `Click "Run Code" to compile and execute your ${selectedLanguage.toUpperCase()} code...`}
+                        </span>
                       )}
                     </div>
                   </div>
