@@ -25,8 +25,35 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const CodeSpark = () => {
-  const [code, setCode] = useState(`print("Hello, World!")
-# Write your Python code here`);
+  const getDefaultCode = (language: string) => {
+    const defaultCodes: Record<string, string> = {
+      python: `print("Hello, World!")
+# Write your Python code here`,
+      javascript: `console.log("Hello, World!");
+// Write your JavaScript code here`,
+      c: `#include <stdio.h>
+
+int main() {
+    printf("Hello, World!\\n");
+    return 0;
+}`,
+      cpp: `#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "Hello, World!" << endl;
+    return 0;
+}`,
+      java: `public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}`
+    };
+    return defaultCodes[language] || defaultCodes.python;
+  };
+
+  const [code, setCode] = useState(getDefaultCode("python"));
   const [output, setOutput] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("python");
@@ -516,7 +543,16 @@ int main() {
     if (examples && examples[exampleName]) {
       setCode(examples[exampleName]);
       setOutput("");
+      setError("");
     }
+  };
+
+  // Handle language change
+  const handleLanguageChange = (newLanguage: string) => {
+    setSelectedLanguage(newLanguage);
+    setCode(getDefaultCode(newLanguage));
+    setOutput("");
+    setError("");
   };
 
   // Filter courses based on search
@@ -689,7 +725,7 @@ int main() {
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-bold">Interactive Code Editor</h2>
                   <div className="flex items-center space-x-3">
-                    <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                    <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
                       <SelectTrigger className="w-40 bg-slate-700 border-slate-600 text-white">
                         <SelectValue />
                       </SelectTrigger>
@@ -743,31 +779,7 @@ int main() {
                         size="sm" 
                         variant="outline"
                         onClick={() => {
-                          const defaultCode = {
-                            python: `print("Hello, World!")
-# Write your Python code here`,
-                            javascript: `console.log("Hello, World!");
-// Write your JavaScript code here`,
-                            c: `#include <stdio.h>
-
-int main() {
-    printf("Hello, World!\\n");
-    return 0;
-}`,
-                            cpp: `#include <iostream>
-using namespace std;
-
-int main() {
-    cout << "Hello, World!" << endl;
-    return 0;
-}`,
-                            java: `public class Main {
-    public static void main(String[] args) {
-        System.out.println("Hello, World!");
-    }
-}`
-                          };
-                          setCode(defaultCode[selectedLanguage as keyof typeof defaultCode] || defaultCode.python);
+                          setCode(getDefaultCode(selectedLanguage));
                           setOutput("");
                           setError("");
                         }}
