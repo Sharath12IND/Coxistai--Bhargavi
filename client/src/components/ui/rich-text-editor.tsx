@@ -97,9 +97,7 @@ export default function RichTextEditor({ content = '', onUpdate, title = 'Untitl
       }),
       TextStyle,
       FontFamily,
-      Color.configure({
-        types: ['textStyle'],
-      }),
+      Color,
       Highlight.configure({
         multicolor: true,
       }),
