@@ -385,71 +385,6 @@ export default function CollegeRecommender() {
 
   const [showFilters, setShowFilters] = useState(false);
 
-  const filteredColleges = useMemo(() => {
-    return COLLEGES.filter(college => {
-      // SAT Score filter - more inclusive approach
-      if (filters.satScore > 0) {
-        const isInRange = filters.satScore >= college.satRange[0] - 100 && filters.satScore <= college.satRange[1] + 50;
-        if (!isInRange) return false;
-      }
-
-      // ACT Score filter - more inclusive approach  
-      if (filters.actScore > 0) {
-        const isInRange = filters.actScore >= college.actRange[0] - 2 && filters.actScore <= college.actRange[1] + 1;
-        if (!isInRange) return false;
-      }
-
-      // GPA filter - more inclusive approach
-      if (filters.gpa > 0) {
-        const isInRange = filters.gpa >= college.gpaRange[0] - 0.3;
-        if (!isInRange) return false;
-      }
-
-      // Major filter
-      if (filters.major && filters.major !== "any" && !college.majors.some(major => 
-        major.toLowerCase().includes(filters.major.toLowerCase()))) {
-        return false;
-      }
-
-      // State filter
-      if (filters.state && filters.state !== "any" && college.state !== filters.state) {
-        return false;
-      }
-
-      // Type filter
-      if (filters.type && filters.type !== "any" && college.type !== filters.type) {
-        return false;
-      }
-
-      // Tuition filter
-      if (college.tuition > filters.maxTuition) {
-        return false;
-      }
-
-      // Acceptance rate filter
-      if (college.acceptanceRate < filters.minAcceptanceRate) {
-        return false;
-      }
-
-      // Search term filter
-      if (filters.searchTerm && 
-          !college.name.toLowerCase().includes(filters.searchTerm.toLowerCase()) &&
-          !college.location.toLowerCase().includes(filters.searchTerm.toLowerCase())) {
-        return false;
-      }
-
-      return true;
-    }).sort((a, b) => {
-      // Sort by match score first, then by ranking
-      const scoreA = getMatchScore(a);
-      const scoreB = getMatchScore(b);
-      if (scoreB !== scoreA) {
-        return scoreB - scoreA; // Higher score first
-      }
-      return a.ranking - b.ranking; // Lower ranking number first
-    });
-  }, [filters]);
-
   const getMatchScore = (college: College) => {
     let score = 0;
     
@@ -517,6 +452,71 @@ export default function CollegeRecommender() {
 
     return Math.min(score, 100);
   };
+
+  const filteredColleges = useMemo(() => {
+    return COLLEGES.filter(college => {
+      // SAT Score filter - more inclusive approach
+      if (filters.satScore > 0) {
+        const isInRange = filters.satScore >= college.satRange[0] - 100 && filters.satScore <= college.satRange[1] + 50;
+        if (!isInRange) return false;
+      }
+
+      // ACT Score filter - more inclusive approach  
+      if (filters.actScore > 0) {
+        const isInRange = filters.actScore >= college.actRange[0] - 2 && filters.actScore <= college.actRange[1] + 1;
+        if (!isInRange) return false;
+      }
+
+      // GPA filter - more inclusive approach
+      if (filters.gpa > 0) {
+        const isInRange = filters.gpa >= college.gpaRange[0] - 0.3;
+        if (!isInRange) return false;
+      }
+
+      // Major filter
+      if (filters.major && filters.major !== "any" && !college.majors.some(major => 
+        major.toLowerCase().includes(filters.major.toLowerCase()))) {
+        return false;
+      }
+
+      // State filter
+      if (filters.state && filters.state !== "any" && college.state !== filters.state) {
+        return false;
+      }
+
+      // Type filter
+      if (filters.type && filters.type !== "any" && college.type !== filters.type) {
+        return false;
+      }
+
+      // Tuition filter
+      if (college.tuition > filters.maxTuition) {
+        return false;
+      }
+
+      // Acceptance rate filter
+      if (college.acceptanceRate < filters.minAcceptanceRate) {
+        return false;
+      }
+
+      // Search term filter
+      if (filters.searchTerm && 
+          !college.name.toLowerCase().includes(filters.searchTerm.toLowerCase()) &&
+          !college.location.toLowerCase().includes(filters.searchTerm.toLowerCase())) {
+        return false;
+      }
+
+      return true;
+    }).sort((a, b) => {
+      // Sort by match score first, then by ranking
+      const scoreA = getMatchScore(a);
+      const scoreB = getMatchScore(b);
+      if (scoreB !== scoreA) {
+        return scoreB - scoreA; // Higher score first
+      }
+      return a.ranking - b.ranking; // Lower ranking number first
+    });
+  }, [filters, getMatchScore]);
 
   const getMatchLevel = (score: number) => {
     if (score >= 80) return { level: "Excellent Match", color: "bg-green-500" };
