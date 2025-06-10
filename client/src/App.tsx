@@ -44,12 +44,14 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden">
-          <AnimatedBackground />
-          <Navigation />
-          <Router />
-          <Toaster />
-        </div>
+        <LoadingProvider>
+          <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden">
+            <AnimatedBackground />
+            <Navigation />
+            <Router />
+            <Toaster />
+          </div>
+        </LoadingProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

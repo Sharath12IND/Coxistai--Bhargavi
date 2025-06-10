@@ -19,6 +19,8 @@ import GlassmorphismButton from "@/components/ui/glassmorphism-button";
 import FileUpload from "@/components/ui/file-upload";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useLoading } from "@/contexts/LoadingContext";
+import { MiniLoader } from "@/components/ui/page-loader";
 
 interface UploadedFile {
   file: File;
@@ -43,6 +45,8 @@ interface ChatSession {
 }
 
 const SparkTutorChat = () => {
+  const { showLoader, hideLoader } = useLoading();
+  
   // Chat sessions state
   const [chatSessions, setChatSessions] = useState<ChatSession[]>(() => {
     const saved = localStorage.getItem('sparktutor-sessions');
@@ -72,6 +76,7 @@ const SparkTutorChat = () => {
   const [inputValue, setInputValue] = useState("");
   const [attachedFiles, setAttachedFiles] = useState<UploadedFile[]>([]);
   const [showFileDialog, setShowFileDialog] = useState(false);
+  const [isAITyping, setIsAITyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -210,6 +215,7 @@ const SparkTutorChat = () => {
         setAttachedFiles([]);
         
         // Generate AI response
+        setIsAITyping(true);
         setTimeout(() => {
           generateAIResponse(userMessage, newSession.messages);
         }, 1000);
@@ -222,6 +228,7 @@ const SparkTutorChat = () => {
     setAttachedFiles([]);
 
     // Generate AI response
+    setIsAITyping(true);
     setTimeout(() => {
       generateAIResponse(userMessage, [...messages, userMessage]);
     }, 1000);
