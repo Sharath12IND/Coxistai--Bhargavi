@@ -63,6 +63,7 @@ int main() {
   const [showAddCourseDialog, setShowAddCourseDialog] = useState(false);
   const [customCourse, setCustomCourse] = useState({ name: "", query: "" });
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedRoadmapItem, setSelectedRoadmapItem] = useState<number | null>(null);
 
   // Default courses with YouTube links
   const [courses, setCourses] = useState([
@@ -121,7 +122,45 @@ int main() {
       completed: true,
       progress: 100,
       color: "green",
-      lessons: ["Variables & Data Types", "Basic Operations", "Input/Output"]
+      lessons: ["Variables & Data Types", "Basic Operations", "Input/Output"],
+      detailedContent: {
+        overview: "Master the building blocks of programming including variables, data types, and fundamental operations.",
+        concepts: [
+          {
+            title: "Variables & Data Types",
+            description: "Learn how to store and manipulate different types of data",
+            points: [
+              "String variables for text data",
+              "Integer variables for whole numbers", 
+              "Float variables for decimal numbers",
+              "Boolean variables for true/false values",
+              "Variable naming conventions"
+            ]
+          },
+          {
+            title: "Basic Operations", 
+            description: "Perform calculations and manipulate data",
+            points: [
+              "Arithmetic operations (+, -, *, /)",
+              "String concatenation and manipulation",
+              "Type conversion between data types",
+              "Assignment operators (=, +=, -=)",
+              "Operator precedence and evaluation order"
+            ]
+          },
+          {
+            title: "Input/Output",
+            description: "Interact with users and display results",
+            points: [
+              "Getting user input with input() functions",
+              "Displaying output with print() statements",
+              "Formatting output with f-strings",
+              "Reading from and writing to files",
+              "Error handling for invalid input"
+            ]
+          }
+        ]
+      }
     },
     {
       id: 2,
@@ -131,7 +170,45 @@ int main() {
       progress: 75,
       color: "blue",
       current: true,
-      lessons: ["If Statements", "For Loops", "While Loops", "Switch Cases"]
+      lessons: ["If Statements", "For Loops", "While Loops", "Switch Cases"],
+      detailedContent: {
+        overview: "Control the flow of your programs with conditional statements and loops to make decisions and repeat actions.",
+        concepts: [
+          {
+            title: "Conditional Statements",
+            description: "Make decisions in your code based on conditions",
+            points: [
+              "if statements for basic conditions",
+              "else clauses for alternative actions",
+              "elif for multiple condition checks",
+              "Nested conditionals for complex logic",
+              "Comparison operators (==, !=, <, >)"
+            ]
+          },
+          {
+            title: "For Loops",
+            description: "Iterate over sequences and repeat code blocks",
+            points: [
+              "Basic for loop syntax and structure",
+              "Iterating through lists and ranges",
+              "Using loop variables and counters",
+              "Nested loops for multi-dimensional data",
+              "Loop control with break and continue"
+            ]
+          },
+          {
+            title: "While Loops",
+            description: "Repeat code while conditions are true",
+            points: [
+              "While loop syntax and conditions",
+              "Avoiding infinite loops",
+              "Loop counters and incrementing",
+              "Input validation with while loops",
+              "Do-while loop patterns"
+            ]
+          }
+        ]
+      }
     },
     {
       id: 3,
@@ -140,7 +217,45 @@ int main() {
       completed: false,
       progress: 30,
       color: "orange",
-      lessons: ["Function Definition", "Parameters", "Return Values", "Modules"]
+      lessons: ["Function Definition", "Parameters", "Return Values", "Modules"],
+      detailedContent: {
+        overview: "Organize your code into reusable functions and modules to create more maintainable and efficient programs.",
+        concepts: [
+          {
+            title: "Function Basics",
+            description: "Create and use functions to organize code",
+            points: [
+              "Function definition syntax (def keyword)",
+              "Function naming conventions",
+              "Calling functions and execution flow",
+              "Local vs global variable scope",
+              "Function documentation with docstrings"
+            ]
+          },
+          {
+            title: "Parameters & Arguments",
+            description: "Pass data to functions for processing",
+            points: [
+              "Positional parameters and arguments",
+              "Default parameter values",
+              "Keyword arguments for clarity",
+              "Variable-length arguments (*args, **kwargs)",
+              "Parameter validation and type hints"
+            ]
+          },
+          {
+            title: "Return Values & Modules",
+            description: "Get results from functions and organize code",
+            points: [
+              "Returning single and multiple values",
+              "Using return statements effectively",
+              "Importing modules and libraries",
+              "Creating your own modules",
+              "Package management and dependencies"
+            ]
+          }
+        ]
+      }
     },
     {
       id: 4,
@@ -149,7 +264,45 @@ int main() {
       completed: false,
       progress: 0,
       color: "gray",
-      lessons: ["Arrays", "Objects", "Sets", "Maps"]
+      lessons: ["Arrays", "Objects", "Sets", "Maps"],
+      detailedContent: {
+        overview: "Master different ways to organize and store data efficiently for various programming tasks.",
+        concepts: [
+          {
+            title: "Lists & Arrays",
+            description: "Store and manipulate ordered collections of data",
+            points: [
+              "Creating and initializing lists",
+              "Accessing elements by index",
+              "Adding and removing elements",
+              "List slicing and subsetting",
+              "Sorting and searching in lists"
+            ]
+          },
+          {
+            title: "Dictionaries & Objects",
+            description: "Store key-value pairs and structured data",
+            points: [
+              "Creating dictionaries with key-value pairs",
+              "Accessing and modifying dictionary values",
+              "Dictionary methods and operations",
+              "Nested dictionaries for complex data",
+              "JSON data handling and conversion"
+            ]
+          },
+          {
+            title: "Sets & Advanced Structures",
+            description: "Work with unique collections and specialized structures",
+            points: [
+              "Creating sets for unique elements",
+              "Set operations (union, intersection)",
+              "Tuples for immutable sequences",
+              "Stack and queue implementations",
+              "Choosing the right data structure"
+            ]
+          }
+        ]
+      }
     },
     {
       id: 5,
@@ -158,7 +311,45 @@ int main() {
       completed: false,
       progress: 0,
       color: "gray",
-      lessons: ["Classes", "Objects", "Inheritance", "Polymorphism"]
+      lessons: ["Classes", "Objects", "Inheritance", "Polymorphism"],
+      detailedContent: {
+        overview: "Learn to organize code using objects and classes for more scalable and maintainable applications.",
+        concepts: [
+          {
+            title: "Classes & Objects",
+            description: "Create blueprints and instances for structured programming",
+            points: [
+              "Class definition and structure",
+              "Creating object instances",
+              "Instance variables and attributes",
+              "Constructor methods (__init__)",
+              "Class vs instance methods"
+            ]
+          },
+          {
+            title: "Inheritance & Polymorphism",
+            description: "Extend classes and create flexible object hierarchies",
+            points: [
+              "Inheriting from parent classes",
+              "Method overriding and extension",
+              "Super() for parent class access",
+              "Multiple inheritance patterns",
+              "Abstract classes and interfaces"
+            ]
+          },
+          {
+            title: "Encapsulation & Design",
+            description: "Hide implementation details and design clean interfaces",
+            points: [
+              "Private and protected attributes",
+              "Property decorators and getters/setters",
+              "Class design principles",
+              "Composition vs inheritance",
+              "Design patterns and best practices"
+            ]
+          }
+        ]
+      }
     }
   ];
 
@@ -530,10 +721,13 @@ int main() {
                 {roadmapItems.map((item, index) => (
                   <motion.div
                     key={item.id}
-                    className="flex items-start space-x-4 cursor-pointer hover:bg-white/5 p-2 rounded-lg transition-colors"
+                    className={`flex items-start space-x-4 cursor-pointer hover:bg-white/5 p-3 rounded-lg transition-all duration-200 ${
+                      selectedRoadmapItem === item.id ? 'bg-white/10 border border-white/20' : ''
+                    }`}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1, duration: 0.5 }}
+                    onClick={() => setSelectedRoadmapItem(selectedRoadmapItem === item.id ? null : item.id)}
                   >
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                       item.completed 
@@ -796,216 +990,63 @@ int main() {
                 </div>
               </div>
               
-              {/* Programming Concepts - Comprehensive Learning Content */}
+              {/* Dynamic Learning Content Based on Roadmap Selection */}
               <div className="p-6 border-t border-white/10">
-                <h3 className="text-lg font-semibold mb-6">Complete Programming Concepts Guide</h3>
-                <div className="max-h-96 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
-                  
-                  {/* Fundamentals */}
-                  <div className="glassmorphism rounded-lg p-4">
-                    <h4 className="font-semibold text-blue-400 mb-3 flex items-center">
-                      <span className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-xs text-white mr-2">1</span>
-                      Variables & Data Types
-                    </h4>
-                    <p className="text-slate-400 text-sm mb-2">
-                      Variables are containers that store data values. They have names and can hold different types of data.
-                    </p>
-                    <ul className="text-slate-500 text-xs space-y-1 ml-4">
-                      <li>• <span className="text-blue-300">String</span>: Text data like "Hello World"</li>
-                      <li>• <span className="text-green-300">Integer</span>: Whole numbers like 42, -10</li>
-                      <li>• <span className="text-yellow-300">Float</span>: Decimal numbers like 3.14, -2.5</li>
-                      <li>• <span className="text-purple-300">Boolean</span>: True or False values</li>
-                      <li>• <span className="text-red-300">Null/None</span>: Represents no value</li>
-                    </ul>
-                  </div>
-
-                  <div className="glassmorphism rounded-lg p-4">
-                    <h4 className="font-semibold text-green-400 mb-3 flex items-center">
-                      <span className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-xs text-white mr-2">2</span>
-                      Operators & Expressions
-                    </h4>
-                    <p className="text-slate-400 text-sm mb-2">
-                      Operators perform operations on variables and values to create expressions.
-                    </p>
-                    <ul className="text-slate-500 text-xs space-y-1 ml-4">
-                      <li>• <span className="text-green-300">Arithmetic</span>: +, -, *, /, % (modulo)</li>
-                      <li>• <span className="text-blue-300">Comparison</span>: ==, !=, {"<"}, {">"}, {"<="}, {">="}</li>
-                      <li>• <span className="text-purple-300">Logical</span>: AND ({"&&"}), OR (||), NOT (!)</li>
-                      <li>• <span className="text-yellow-300">Assignment</span>: =, +=, -=, *=, /=</li>
-                    </ul>
-                  </div>
-
-                  <div className="glassmorphism rounded-lg p-4">
-                    <h4 className="font-semibold text-purple-400 mb-3 flex items-center">
-                      <span className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-xs text-white mr-2">3</span>
-                      Control Flow - Conditionals
-                    </h4>
-                    <p className="text-slate-400 text-sm mb-2">
-                      Control structures allow programs to make decisions and execute different code paths.
-                    </p>
-                    <ul className="text-slate-500 text-xs space-y-1 ml-4">
-                      <li>• <span className="text-purple-300">if statement</span>: Execute code if condition is true</li>
-                      <li>• <span className="text-blue-300">else clause</span>: Execute when if condition is false</li>
-                      <li>• <span className="text-green-300">elif/else if</span>: Chain multiple conditions</li>
-                      <li>• <span className="text-yellow-300">switch/case</span>: Multiple condition branches</li>
-                      <li>• <span className="text-red-300">ternary operator</span>: Inline conditional expressions</li>
-                    </ul>
-                  </div>
-
-                  <div className="glassmorphism rounded-lg p-4">
-                    <h4 className="font-semibold text-orange-400 mb-3 flex items-center">
-                      <span className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-xs text-white mr-2">4</span>
-                      Loops & Iteration
-                    </h4>
-                    <p className="text-slate-400 text-sm mb-2">
-                      Loops allow code to be executed repeatedly until a condition is met.
-                    </p>
-                    <ul className="text-slate-500 text-xs space-y-1 ml-4">
-                      <li>• <span className="text-orange-300">for loop</span>: Iterate a specific number of times</li>
-                      <li>• <span className="text-red-300">while loop</span>: Continue while condition is true</li>
-                      <li>• <span className="text-yellow-300">do-while</span>: Execute at least once, then check condition</li>
-                      <li>• <span className="text-green-300">foreach</span>: Iterate through collections</li>
-                      <li>• <span className="text-blue-300">break/continue</span>: Control loop execution</li>
-                    </ul>
-                  </div>
-
-                  <div className="glassmorphism rounded-lg p-4">
-                    <h4 className="font-semibold text-cyan-400 mb-3 flex items-center">
-                      <span className="w-6 h-6 bg-cyan-500 rounded-full flex items-center justify-center text-xs text-white mr-2">5</span>
-                      Functions & Methods
-                    </h4>
-                    <p className="text-slate-400 text-sm mb-2">
-                      Functions are reusable blocks of code that perform specific tasks and can accept inputs.
-                    </p>
-                    <ul className="text-slate-500 text-xs space-y-1 ml-4">
-                      <li>• <span className="text-cyan-300">Function definition</span>: Creating reusable code blocks</li>
-                      <li>• <span className="text-blue-300">Parameters</span>: Input values passed to functions</li>
-                      <li>• <span className="text-green-300">Return values</span>: Output data from functions</li>
-                      <li>• <span className="text-purple-300">Scope</span>: Variable accessibility within functions</li>
-                      <li>• <span className="text-yellow-300">Recursion</span>: Functions calling themselves</li>
-                    </ul>
-                  </div>
-
-                  <div className="glassmorphism rounded-lg p-4">
-                    <h4 className="font-semibold text-indigo-400 mb-3 flex items-center">
-                      <span className="w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center text-xs text-white mr-2">6</span>
-                      Data Structures
-                    </h4>
-                    <p className="text-slate-400 text-sm mb-2">
-                      Data structures organize and store data efficiently for different use cases.
-                    </p>
-                    <ul className="text-slate-500 text-xs space-y-1 ml-4">
-                      <li>• <span className="text-indigo-300">Arrays/Lists</span>: Ordered collections of items</li>
-                      <li>• <span className="text-purple-300">Objects/Dictionaries</span>: Key-value pair collections</li>
-                      <li>• <span className="text-blue-300">Sets</span>: Collections of unique items</li>
-                      <li>• <span className="text-green-300">Stacks</span>: Last-In-First-Out (LIFO) structure</li>
-                      <li>• <span className="text-yellow-300">Queues</span>: First-In-First-Out (FIFO) structure</li>
-                    </ul>
-                  </div>
-
-                  <div className="glassmorphism rounded-lg p-4">
-                    <h4 className="font-semibold text-pink-400 mb-3 flex items-center">
-                      <span className="w-6 h-6 bg-pink-500 rounded-full flex items-center justify-center text-xs text-white mr-2">7</span>
-                      Object-Oriented Programming
-                    </h4>
-                    <p className="text-slate-400 text-sm mb-2">
-                      OOP organizes code using objects that contain both data and methods.
-                    </p>
-                    <ul className="text-slate-500 text-xs space-y-1 ml-4">
-                      <li>• <span className="text-pink-300">Classes</span>: Templates for creating objects</li>
-                      <li>• <span className="text-purple-300">Objects</span>: Instances of classes</li>
-                      <li>• <span className="text-blue-300">Inheritance</span>: Classes inheriting from other classes</li>
-                      <li>• <span className="text-green-300">Encapsulation</span>: Hiding internal implementation details</li>
-                      <li>• <span className="text-yellow-300">Polymorphism</span>: Same interface, different implementations</li>
-                    </ul>
-                  </div>
-
-                  <div className="glassmorphism rounded-lg p-4">
-                    <h4 className="font-semibold text-red-400 mb-3 flex items-center">
-                      <span className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-xs text-white mr-2">8</span>
-                      Error Handling
-                    </h4>
-                    <p className="text-slate-400 text-sm mb-2">
-                      Managing and responding to errors that occur during program execution.
-                    </p>
-                    <ul className="text-slate-500 text-xs space-y-1 ml-4">
-                      <li>• <span className="text-red-300">Try-catch blocks</span>: Handling exceptions gracefully</li>
-                      <li>• <span className="text-orange-300">Exception types</span>: Different kinds of errors</li>
-                      <li>• <span className="text-yellow-300">Finally blocks</span>: Code that always executes</li>
-                      <li>• <span className="text-green-300">Custom exceptions</span>: Creating your own error types</li>
-                      <li>• <span className="text-blue-300">Debugging</span>: Finding and fixing errors</li>
-                    </ul>
-                  </div>
-
-                  <div className="glassmorphism rounded-lg p-4">
-                    <h4 className="font-semibold text-teal-400 mb-3 flex items-center">
-                      <span className="w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center text-xs text-white mr-2">9</span>
-                      File Input/Output
-                    </h4>
-                    <p className="text-slate-400 text-sm mb-2">
-                      Reading from and writing to files to persist data beyond program execution.
-                    </p>
-                    <ul className="text-slate-500 text-xs space-y-1 ml-4">
-                      <li>• <span className="text-teal-300">File opening</span>: Access files in different modes</li>
-                      <li>• <span className="text-blue-300">Reading data</span>: Get content from files</li>
-                      <li>• <span className="text-green-300">Writing data</span>: Save content to files</li>
-                      <li>• <span className="text-purple-300">File paths</span>: Navigating file system locations</li>
-                      <li>• <span className="text-yellow-300">Resource management</span>: Properly closing files</li>
-                    </ul>
-                  </div>
-
-                  <div className="glassmorphism rounded-lg p-4">
-                    <h4 className="font-semibold text-amber-400 mb-3 flex items-center">
-                      <span className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center text-xs text-white mr-2">10</span>
-                      Algorithms & Problem Solving
-                    </h4>
-                    <p className="text-slate-400 text-sm mb-2">
-                      Step-by-step procedures for solving computational problems efficiently.
-                    </p>
-                    <ul className="text-slate-500 text-xs space-y-1 ml-4">
-                      <li>• <span className="text-amber-300">Searching</span>: Finding items in data structures</li>
-                      <li>• <span className="text-orange-300">Sorting</span>: Arranging data in order</li>
-                      <li>• <span className="text-red-300">Recursion</span>: Breaking problems into smaller parts</li>
-                      <li>• <span className="text-purple-300">Time complexity</span>: Analyzing algorithm efficiency</li>
-                      <li>• <span className="text-blue-300">Space complexity</span>: Memory usage optimization</li>
-                    </ul>
-                  </div>
-
-                  <div className="glassmorphism rounded-lg p-4">
-                    <h4 className="font-semibold text-emerald-400 mb-3 flex items-center">
-                      <span className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-xs text-white mr-2">11</span>
-                      Software Development Practices
-                    </h4>
-                    <p className="text-slate-400 text-sm mb-2">
-                      Best practices for writing maintainable, readable, and reliable code.
-                    </p>
-                    <ul className="text-slate-500 text-xs space-y-1 ml-4">
-                      <li>• <span className="text-emerald-300">Code organization</span>: Structuring projects and modules</li>
-                      <li>• <span className="text-green-300">Documentation</span>: Writing clear comments and docs</li>
-                      <li>• <span className="text-blue-300">Testing</span>: Verifying code works correctly</li>
-                      <li>• <span className="text-purple-300">Version control</span>: Tracking code changes over time</li>
-                      <li>• <span className="text-yellow-300">Code review</span>: Collaborative code improvement</li>
-                    </ul>
-                  </div>
-
-                  <div className="glassmorphism rounded-lg p-4">
-                    <h4 className="font-semibold text-violet-400 mb-3 flex items-center">
-                      <span className="w-6 h-6 bg-violet-500 rounded-full flex items-center justify-center text-xs text-white mr-2">12</span>
-                      Advanced Concepts
-                    </h4>
-                    <p className="text-slate-400 text-sm mb-2">
-                      More complex programming concepts for advanced applications.
-                    </p>
-                    <ul className="text-slate-500 text-xs space-y-1 ml-4">
-                      <li>• <span className="text-violet-300">Concurrency</span>: Running multiple tasks simultaneously</li>
-                      <li>• <span className="text-purple-300">Memory management</span>: Efficient use of computer memory</li>
-                      <li>• <span className="text-blue-300">Design patterns</span>: Common solutions to programming problems</li>
-                      <li>• <span className="text-green-300">APIs</span>: Interfaces for different software components</li>
-                      <li>• <span className="text-yellow-300">Databases</span>: Storing and retrieving large amounts of data</li>
-                    </ul>
-                  </div>
-
-                </div>
+                {selectedRoadmapItem ? (
+                  <>
+                    <h3 className="text-lg font-semibold mb-6">
+                      {roadmapItems.find(item => item.id === selectedRoadmapItem)?.title} - Learning Guide
+                    </h3>
+                    <div className="max-h-96 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
+                      {(() => {
+                        const selectedItem = roadmapItems.find(item => item.id === selectedRoadmapItem);
+                        if (!selectedItem?.detailedContent) return null;
+                        
+                        return (
+                          <>
+                            <div className="glassmorphism rounded-lg p-4 mb-4">
+                              <h4 className="font-semibold text-blue-400 mb-2">Overview</h4>
+                              <p className="text-slate-400 text-sm">{selectedItem.detailedContent.overview}</p>
+                            </div>
+                            
+                            {selectedItem.detailedContent.concepts.map((concept, index) => (
+                              <div key={index} className="glassmorphism rounded-lg p-4">
+                                <h4 className="font-semibold text-green-400 mb-3 flex items-center">
+                                  <span className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-xs text-white mr-2">
+                                    {index + 1}
+                                  </span>
+                                  {concept.title}
+                                </h4>
+                                <p className="text-slate-400 text-sm mb-2">{concept.description}</p>
+                                <ul className="text-slate-500 text-xs space-y-1 ml-4">
+                                  {concept.points.map((point, pointIndex) => (
+                                    <li key={pointIndex}>• <span className="text-blue-300">{point}</span></li>
+                                  ))}
+                                </ul>
+                              </div>
+                            ))}
+                          </>
+                        );
+                      })()}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-lg font-semibold mb-6">Complete Programming Concepts Guide</h3>
+                    <div className="text-center py-8">
+                      <div className="glassmorphism rounded-lg p-6">
+                        <Book className="w-12 h-12 text-blue-400 mx-auto mb-4" />
+                        <h4 className="text-lg font-semibold text-blue-400 mb-2">Interactive Learning</h4>
+                        <p className="text-slate-400 text-sm mb-4">
+                          Click on any roadmap item above to view detailed learning content and concepts for that topic.
+                        </p>
+                        <p className="text-slate-500 text-xs">
+                          Each section includes comprehensive explanations, key concepts, and practical examples to help you master programming fundamentals.
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </motion.div>
           </div>
