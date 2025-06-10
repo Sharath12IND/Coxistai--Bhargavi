@@ -34,12 +34,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const login = () => {
     setIsAuthenticated(true);
     localStorage.setItem('coexist-auth-state', 'authenticated');
+    // Trigger a custom event to notify other components
+    window.dispatchEvent(new CustomEvent('auth-change', { detail: { isAuthenticated: true } }));
   };
 
   const logout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('coexist-auth-state');
     localStorage.removeItem('coexist-user-profile');
+    // Trigger a custom event to notify other components
+    window.dispatchEvent(new CustomEvent('auth-change', { detail: { isAuthenticated: false } }));
   };
 
   return (

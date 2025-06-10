@@ -120,15 +120,13 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
     checkAuth();
 
-    // Listen for auth state changes
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'coexist-auth-state') {
-        checkAuth();
-      }
+    // Listen for auth state changes via custom event
+    const handleAuthChange = () => {
+      checkAuth();
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('auth-change', handleAuthChange);
+    return () => window.removeEventListener('auth-change', handleAuthChange);
   }, []);
 
   const updateProfile = async (profileData: UpdateUserProfile) => {
