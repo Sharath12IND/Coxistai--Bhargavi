@@ -166,21 +166,30 @@ int main() {
     python: {
       "Hello World": `print("Hello, World!")
 print("Welcome to Python!")`,
-      "Variables": `name = "Alice"
-age = 25
-height = 5.7
-print(f"Name: {name}, Age: {age}, Height: {height}")`,
-      "If Statement": `age = 18
-if age >= 18:
-    print("You can vote!")
+      "User Input": `name = input("Enter your name: ")
+age = int(input("Enter your age: "))
+print(f"Hello {name}! You are {age} years old.")`,
+      "Calculator": `num1 = float(input("Enter first number: "))
+num2 = float(input("Enter second number: "))
+operation = input("Enter operation (+, -, *, /): ")
+
+if operation == "+":
+    result = num1 + num2
+elif operation == "-":
+    result = num1 - num2
+elif operation == "*":
+    result = num1 * num2
+elif operation == "/":
+    result = num1 / num2
 else:
-    print("Wait until you're 18")`,
-      "For Loop": `for i in range(5):
-    print(f"Count: {i}")
+    result = "Invalid operation"
+
+print(f"Result: {result}")`,
+      "For Loop": `n = int(input("Enter number of iterations: "))
+for i in range(n):
+    print(f"Count: {i + 1}")
     
-fruits = ["apple", "banana", "orange"]
-for fruit in fruits:
-    print(f"I like {fruit}")`
+print("Loop completed!")`
     },
     javascript: {
       "Hello World": `console.log("Hello, World!");
@@ -400,120 +409,41 @@ int main() {
     }
   };
 
-  // Enhanced code execution function with error handling
+  // Real code execution function using backend compiler
   const runCode = async () => {
     setIsRunning(true);
     setOutput("Compiling and running...");
     setError("");
+    setExecutionTime(0);
     
-    // Validate syntax first
-    const validation = validateSyntax(code, selectedLanguage);
-    if (!validation.isValid) {
-      setError(validation.error || "Syntax error detected");
-      setOutput("");
-      setIsRunning(false);
-      return;
-    }
-    
-    // Simulate compilation and execution
-    setTimeout(() => {
-      try {
-        let outputs: string[] = [];
-        
-        switch (selectedLanguage) {
-          case "python":
-            if (code.includes('print(')) {
-              const printMatches = code.match(/print\([^)]*\)/g);
-              if (printMatches) {
-                outputs = printMatches.map(match => {
-                  const content = match.replace(/print\(|\)/g, '').replace(/"/g, '').replace(/'/g, '').replace(/f"/g, '');
-                  // Handle f-strings
-                  if (content.includes('{') && content.includes('}')) {
-                    return content.replace(/{[^}]*}/g, '[variable]');
-                  }
-                  return content;
-                });
-              }
-            } else {
-              outputs = ["Program executed successfully"];
-            }
-            break;
-            
-          case "javascript":
-            if (code.includes('console.log(')) {
-              const logMatches = code.match(/console\.log\([^)]*\)/g);
-              if (logMatches) {
-                outputs = logMatches.map(match => {
-                  const content = match.replace(/console\.log\(|\)/g, '').replace(/"/g, '').replace(/'/g, '').replace(/`/g, '');
-                  // Handle template literals
-                  if (content.includes('${') && content.includes('}')) {
-                    return content.replace(/\$\{[^}]*\}/g, '[variable]');
-                  }
-                  return content;
-                });
-              }
-            } else {
-              outputs = ["Program executed successfully"];
-            }
-            break;
-            
-          case "c":
-            if (code.includes('printf(')) {
-              const printfMatches = code.match(/printf\([^)]*\)/g);
-              if (printfMatches) {
-                outputs = printfMatches.map(match => {
-                  let content = match.replace(/printf\(|\)/g, '').replace(/"/g, '');
-                  content = content.replace(/\\n/g, '').replace(/%[sd]/g, '[variable]').replace(/%\.\d*f/g, '[variable]');
-                  return content;
-                });
-              }
-            } else {
-              outputs = ["Program compiled and executed successfully"];
-            }
-            break;
-            
-          case "cpp":
-            if (code.includes('cout')) {
-              const coutMatches = code.match(/cout\s*<<[^;]*;/g);
-              if (coutMatches) {
-                outputs = coutMatches.map(match => {
-                  let content = match.replace(/cout\s*<<\s*|\s*;\s*/g, '').replace(/"/g, '');
-                  content = content.replace(/endl/g, '').replace(/<<[^"]*$/g, '');
-                  return content.trim();
-                });
-              }
-            } else {
-              outputs = ["Program compiled and executed successfully"];
-            }
-            break;
-            
-          case "java":
-            if (code.includes('System.out.println(')) {
-              const printMatches = code.match(/System\.out\.println\([^)]*\)/g);
-              if (printMatches) {
-                outputs = printMatches.map(match => {
-                  let content = match.replace(/System\.out\.println\(|\)/g, '').replace(/"/g, '');
-                  content = content.replace(/\s*\+\s*[^"]*$/g, '[variable]');
-                  return content;
-                });
-              }
-            } else {
-              outputs = ["Program compiled and executed successfully"];
-            }
-            break;
-            
-          default:
-            outputs = ["Language not supported"];
-        }
-        
-        setOutput(outputs.join('\n'));
-        setError("");
-      } catch (error) {
-        setError(`Runtime Error: An error occurred while executing the code. Please check your syntax and try again.`);
-        setOutput("");
+    try {
+      const response = await fetch('/api/execute', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code,
+          language: selectedLanguage,
+          input: userInput
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Execution failed');
       }
+
+      setOutput(result.output || 'Program executed successfully');
+      setError(result.error || '');
+      setExecutionTime(result.executionTime || 0);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Network error occurred');
+      setOutput('');
+    } finally {
       setIsRunning(false);
-    }, 1500); // Longer delay to simulate compilation
+    }
   };
 
   // Open YouTube course
@@ -806,6 +736,23 @@ int main() {
                   />
                 </div>
                 
+                {/* User Input Section */}
+                <div className="mt-4">
+                  <div className="bg-slate-700 rounded-lg overflow-hidden">
+                    <div className="flex items-center justify-between p-3 bg-slate-600 border-b border-slate-500">
+                      <span className="text-sm text-slate-300">Program Input</span>
+                      <span className="text-xs text-slate-400">Enter input for your program (one line per input)</span>
+                    </div>
+                    <textarea
+                      value={userInput}
+                      onChange={(e) => setUserInput(e.target.value)}
+                      className="w-full h-20 p-3 bg-slate-700 text-white font-mono text-sm resize-none outline-none"
+                      placeholder="Enter input values here (e.g., for input() or scanf)..."
+                      spellCheck={false}
+                    />
+                  </div>
+                </div>
+                
                 {/* Output and Error Display */}
                 <div className="mt-4 space-y-3">
                   {/* Error Display */}
@@ -825,10 +772,16 @@ int main() {
                   
                   {/* Output Display */}
                   <div className="bg-slate-900 rounded-lg overflow-hidden">
-                    <div className="p-3 bg-slate-800 border-b border-slate-700">
+                    <div className="p-3 bg-slate-800 border-b border-slate-700 flex items-center justify-between">
                       <span className="text-sm text-slate-300">
                         {error ? "⚠️ Output (Previous Run)" : "📤 Output"}
                       </span>
+                      {executionTime > 0 && (
+                        <span className="text-xs text-slate-400 flex items-center">
+                          <Clock className="w-3 h-3 mr-1" />
+                          {executionTime}ms
+                        </span>
+                      )}
                     </div>
                     <div className="p-4 min-h-[100px] font-mono text-sm">
                       {output ? (
