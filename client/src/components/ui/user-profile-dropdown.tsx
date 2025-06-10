@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { LogoutDialog } from "@/components/ui/logout-dialog";
 import { useUser } from "@/contexts/UserContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface UserProfileDropdownProps {
   className?: string;
@@ -27,6 +28,7 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
   const [isOpen, setIsOpen] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const { user, updateProfile } = useUser();
+  const { logout } = useAuth();
 
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];

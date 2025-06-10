@@ -8,6 +8,7 @@ import AnimatedBackground from "@/components/layout/AnimatedBackground";
 import { LoadingProvider } from "@/contexts/LoadingContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { UserProvider } from "@/contexts/UserContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Home from "@/pages/Home";
 import SparkTutorChat from "@/pages/SparkTutorChat";
 import NotesHub from "@/pages/NotesHub";
@@ -58,18 +59,20 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <UserProvider>
-          <TooltipProvider>
-            <LoadingProvider>
-              <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden">
-                <AnimatedBackground />
-                <Navigation />
-                <Router />
-                <Toaster />
-              </div>
-            </LoadingProvider>
-          </TooltipProvider>
-        </UserProvider>
+        <AuthProvider>
+          <UserProvider>
+            <TooltipProvider>
+              <LoadingProvider>
+                <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden">
+                  <AnimatedBackground />
+                  <Navigation />
+                  <Router />
+                  <Toaster />
+                </div>
+              </LoadingProvider>
+            </TooltipProvider>
+          </UserProvider>
+        </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

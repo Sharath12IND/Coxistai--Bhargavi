@@ -4,12 +4,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { NAVIGATION_ITEMS } from "@/lib/constants";
 import UserProfileDropdown from "@/components/ui/user-profile-dropdown";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navigation = () => {
   const [location, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(true); // Mock auth state - in real app this would come from auth context
+  const { isAuthenticated } = useAuth();
 
   const isActive = (path: string) => location === path;
   const isDropdownActive = (dropdown: readonly any[]) => dropdown.some(item => location === item.path);
