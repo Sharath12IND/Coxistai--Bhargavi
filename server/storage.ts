@@ -1,9 +1,10 @@
-import { users, documents, type User, type InsertUser, type Document, type InsertDocument } from "@shared/schema";
+import { users, documents, type User, type InsertUser, type UpdateUserProfile, type Document, type InsertDocument } from "@shared/schema";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUserProfile(id: number, profile: UpdateUserProfile): Promise<User>;
   
   // Document operations
   getDocuments(userId?: number): Promise<Document[]>;
@@ -34,6 +35,15 @@ export class DatabaseStorage implements IStorage {
       .values(insertUser)
       .returning();
     return user;
+  }
+
+  async updateUserProfile(id: number, profile: UpdateUserProfile): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ ...profile, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return updatedUser;
   }
 
   async getDocuments(userId?: number): Promise<Document[]> {

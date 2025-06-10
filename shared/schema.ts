@@ -7,6 +7,26 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  email: text("email"),
+  phone: text("phone"),
+  bio: text("bio"),
+  location: text("location"),
+  timezone: text("timezone"),
+  avatar: text("avatar"),
+  dateOfBirth: text("date_of_birth"),
+  occupation: text("occupation"),
+  company: text("company"),
+  theme: text("theme").default("dark"),
+  emailNotifications: boolean("email_notifications").default(true),
+  pushNotifications: boolean("push_notifications").default(true),
+  marketingEmails: boolean("marketing_emails").default(false),
+  weeklyDigest: boolean("weekly_digest").default(true),
+  language: text("language").default("en"),
+  publicProfile: boolean("public_profile").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const documents = pgTable("documents", {
@@ -60,6 +80,27 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
 });
 
+export const updateUserProfileSchema = createInsertSchema(users).pick({
+  firstName: true,
+  lastName: true,
+  email: true,
+  phone: true,
+  bio: true,
+  location: true,
+  timezone: true,
+  avatar: true,
+  dateOfBirth: true,
+  occupation: true,
+  company: true,
+  theme: true,
+  emailNotifications: true,
+  pushNotifications: true,
+  marketingEmails: true,
+  weeklyDigest: true,
+  language: true,
+  publicProfile: true,
+});
+
 export const insertDocumentSchema = createInsertSchema(documents).pick({
   title: true,
   filename: true,
@@ -78,6 +119,7 @@ export const insertNoteSchema = createInsertSchema(notes).pick({
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type UpdateUserProfile = z.infer<typeof updateUserProfileSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertDocument = z.infer<typeof insertDocumentSchema>;
 export type Document = typeof documents.$inferSelect;

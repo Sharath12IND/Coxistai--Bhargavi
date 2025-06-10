@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertDocumentSchema } from "@shared/schema";
+import { insertDocumentSchema, updateUserProfileSchema } from "@shared/schema";
 import multer from "multer";
 import { exec, spawn } from "child_process";
 import fs from "fs/promises";
