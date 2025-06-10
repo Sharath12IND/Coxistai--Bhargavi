@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion } from "framer-mode";
+import { motion } from "framer-motion";
 import { Settings, Globe, Palette, Clock, Keyboard, Accessibility, Monitor, Download } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";

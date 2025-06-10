@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Shield, Eye, EyeOff, Lock, Globe, Users, Database, AlertTriangle } from "lucide-react";
+import { Shield, Eye, EyeOff, Lock, Globe, Users, Database, AlertTriangle, User } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";

@@ -22,6 +22,10 @@ import Signup from "@/pages/Signup";
 import ForgotPassword from "@/pages/ForgotPassword";
 import LoadingDemo from "@/pages/LoadingDemo";
 import ProfileSettings from "@/pages/ProfileSettings";
+import BillingSubscription from "@/pages/BillingSubscription";
+import NotificationSettings from "@/pages/NotificationSettings";
+import PrivacySettings from "@/pages/PrivacySettings";
+import GeneralSettings from "@/pages/GeneralSettings";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -40,6 +44,10 @@ function Router() {
       <Route path="/signup" component={Signup} />
       <Route path="/forgot-password" component={ForgotPassword} />
       <Route path="/profile" component={ProfileSettings} />
+      <Route path="/billing" component={BillingSubscription} />
+      <Route path="/notifications" component={NotificationSettings} />
+      <Route path="/privacy" component={PrivacySettings} />
+      <Route path="/settings" component={GeneralSettings} />
       <Route path="/demo" component={LoadingDemo} />
       <Route component={NotFound} />
     </Switch>

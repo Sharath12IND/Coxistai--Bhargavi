@@ -25,6 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLoading } from "@/contexts/LoadingContext";
 import { useUser } from "@/contexts/UserContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import UserInfoDisplay from "@/components/ui/user-info-display";
 
 export default function ProfileSettings() {
   const { toast } = useToast();
