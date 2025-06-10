@@ -66,9 +66,9 @@ export default function PrivacySettings() {
 
   const privacyCategories = [
     {
-      title: "Profile Privacy",
-      icon: User,
-      description: "Control who can see your profile information",
+      title: "Account Security",
+      icon: Shield,
+      description: "Protect your account and personal information",
       settings: [
         {
           key: 'publicProfile',
@@ -96,9 +96,34 @@ export default function PrivacySettings() {
       ]
     },
     {
-      title: "Activity & Status",
+      title: "Data Privacy",
+      icon: Database,
+      description: "Control how your data is collected and used",
+      settings: [
+        {
+          key: 'dataCollection',
+          label: 'Usage data collection',
+          description: 'Allow collection of usage data for service improvement',
+          type: 'toggle'
+        },
+        {
+          key: 'analyticsTracking',
+          label: 'Analytics tracking',
+          description: 'Enable tracking for personalized recommendations',
+          type: 'toggle'
+        },
+        {
+          key: 'thirdPartyIntegrations',
+          label: 'Third-party data sharing',
+          description: 'Allow sharing data with integrated educational services',
+          type: 'toggle'
+        }
+      ]
+    },
+    {
+      title: "Privacy Controls",
       icon: Eye,
-      description: "Manage your online presence and activity sharing",
+      description: "Manage your visibility and online presence",
       settings: [
         {
           key: 'showOnlineStatus',
@@ -107,53 +132,15 @@ export default function PrivacySettings() {
           type: 'toggle'
         },
         {
-          key: 'shareStudyProgress',
-          label: 'Share study progress',
-          description: 'Allow friends to see your learning achievements',
-          type: 'toggle'
-        },
-        {
-          key: 'showInLeaderboards',
-          label: 'Show in leaderboards',
-          description: 'Display your name in community rankings',
-          type: 'toggle'
-        }
-      ]
-    },
-    {
-      title: "Communication",
-      icon: Users,
-      description: "Control how others can contact you",
-      settings: [
-        {
           key: 'allowDirectMessages',
           label: 'Allow direct messages',
           description: 'Let other users send you private messages',
           type: 'toggle'
-        }
-      ]
-    },
-    {
-      title: "Data & Analytics",
-      icon: Database,
-      description: "Manage data collection and usage",
-      settings: [
-        {
-          key: 'dataCollection',
-          label: 'Usage data collection',
-          description: 'Help improve our services by sharing usage data',
-          type: 'toggle'
         },
         {
-          key: 'analyticsTracking',
-          label: 'Analytics tracking',
-          description: 'Allow tracking for personalized recommendations',
-          type: 'toggle'
-        },
-        {
-          key: 'thirdPartyIntegrations',
-          label: 'Third-party integrations',
-          description: 'Allow data sharing with integrated services',
+          key: 'shareStudyProgress',
+          label: 'Share study progress',
+          description: 'Allow others to see your learning achievements',
           type: 'toggle'
         }
       ]
@@ -161,7 +148,7 @@ export default function PrivacySettings() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900/20 dark:to-purple-900/20 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900/20 dark:to-purple-900/20 pt-24 pb-12 px-6">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
