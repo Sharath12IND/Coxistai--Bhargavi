@@ -289,6 +289,29 @@ export default function ProfileSettings() {
               </div>
             </div>
 
+            {/* Appearance */}
+            <div className="glassmorphism p-6 rounded-xl">
+              <h2 className="text-xl font-bold text-white mb-4 flex items-center">
+                <Globe className="w-5 h-5 mr-2" />
+                Appearance
+              </h2>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium text-white flex items-center">
+                      {theme === 'dark' ? <Moon className="w-4 h-4 mr-2" /> : <Sun className="w-4 h-4 mr-2" />}
+                      Theme
+                    </h3>
+                    <p className="text-sm text-slate-400">Choose between light and dark mode</p>
+                  </div>
+                  <Switch
+                    checked={theme === 'dark'}
+                    onCheckedChange={handleThemeToggle}
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Preferences */}
             <div className="glassmorphism p-6 rounded-xl">
               <h2 className="text-xl font-bold text-white mb-4 flex items-center">

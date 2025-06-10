@@ -16,45 +16,30 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { LogoutDialog } from "@/components/ui/logout-dialog";
+import { useUser } from "@/contexts/UserContext";
 
 interface UserProfileDropdownProps {
   className?: string;
 }
 
-// Mock user data - in real app this would come from authentication context
-const mockUser = {
-  name: "Alex Johnson",
-  email: "alex.johnson@email.com",
-  avatar: null as string | null, // User can upload their own
-  subscription: {
-    plan: "Pro",
-    status: "active",
-    expiresAt: "2024-07-15",
-    features: ["Unlimited AI Tutoring", "Premium Templates", "Advanced Analytics"]
-  },
-  settings: {
-    notifications: true,
-    theme: "dark"
-  }
-};
-
 export default function UserProfileDropdown({ className = "" }: UserProfileDropdownProps) {
   const [, setLocation] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState(mockUser);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const { user, updateProfile } = useUser();
 
-  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
+    if (file && user) {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         const result = e.target?.result;
         if (typeof result === 'string') {
-          setUser(prev => ({
-            ...prev,
-            avatar: result
-          }));
+          try {
+            await updateProfile({ avatar: result });
+          } catch (error) {
+            console.error('Failed to update avatar:', error);
+          }
         }
       };
       reader.readAsDataURL(file);
@@ -77,17 +62,32 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
     setIsOpen(false);
   };
 
-  const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  const getInitials = (firstName: string = '', lastName: string = '') => {
+    return `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase() || 'U';
   };
 
-  const getPlanColor = (plan: string) => {
-    switch (plan.toLowerCase()) {
-      case 'pro': return 'bg-gradient-to-r from-purple-500 to-pink-500';
-      case 'premium': return 'bg-gradient-to-r from-yellow-500 to-orange-500';
-      default: return 'bg-gradient-to-r from-blue-500 to-green-500';
-    }
+  const getUserName = () => {
+    if (!user) return 'Loading...';
+    return `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'User';
   };
+
+  const getPlanColor = () => {
+    return 'bg-gradient-to-r from-blue-500 to-green-500';
+  };
+
+  if (!user) {
+    return (
+      <div className={`relative ${className}`}>
+        <div className="flex items-center space-x-3 p-2 rounded-xl glassmorphism">
+          <div className="w-8 h-8 bg-slate-700 rounded-full animate-pulse"></div>
+          <div className="hidden sm:block">
+            <div className="w-20 h-3 bg-slate-700 rounded animate-pulse mb-1"></div>
+            <div className="w-16 h-2 bg-slate-700 rounded animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`relative ${className}`}>
@@ -98,14 +98,14 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
         whileTap={{ scale: 0.98 }}
       >
         <Avatar className="w-8 h-8 ring-2 ring-blue-500/30">
-          <AvatarImage src={user.avatar || undefined} alt={user.name} />
+          <AvatarImage src={user.avatar || undefined} alt={getUserName()} />
           <AvatarFallback className="bg-gradient-to-r from-blue-500 to-green-500 text-white text-sm font-semibold">
-            {getInitials(user.name)}
+            {getInitials(user.firstName || '', user.lastName || '')}
           </AvatarFallback>
         </Avatar>
         <div className="hidden sm:block text-left">
-          <div className="text-sm font-medium text-white">{user.name}</div>
-          <div className="text-xs text-slate-400">{user.subscription.plan} Plan</div>
+          <div className="text-sm font-medium text-white">{getUserName()}</div>
+          <div className="text-xs text-slate-400">Pro Plan</div>
         </div>
         <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
           isOpen ? 'rotate-180' : ''
@@ -134,9 +134,9 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
                 <div className="flex items-center space-x-3">
                   <div className="relative">
                     <Avatar className="w-12 h-12 ring-2 ring-blue-500/30">
-                      <AvatarImage src={user.avatar || undefined} alt={user.name} />
+                      <AvatarImage src={user.avatar || undefined} alt={getUserName()} />
                       <AvatarFallback className="bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold">
-                        {getInitials(user.name)}
+                        {getInitials(user.firstName || '', user.lastName || '')}
                       </AvatarFallback>
                     </Avatar>
                     <label className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center cursor-pointer hover:bg-blue-600 transition-colors">
@@ -150,11 +150,11 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
                     </label>
                   </div>
                   <div className="flex-1">
-                    <div className="font-semibold text-white">{user.name}</div>
-                    <div className="text-sm text-slate-400">{user.email}</div>
-                    <Badge className={`mt-1 text-xs ${getPlanColor(user.subscription.plan)} text-white border-0`}>
+                    <div className="font-semibold text-white">{getUserName()}</div>
+                    <div className="text-sm text-slate-400">{user.email || 'No email set'}</div>
+                    <Badge className={`mt-1 text-xs ${getPlanColor()} text-white border-0`}>
                       <Crown className="w-3 h-3 mr-1" />
-                      {user.subscription.plan} Plan
+                      Pro Plan
                     </Badge>
                   </div>
                 </div>
