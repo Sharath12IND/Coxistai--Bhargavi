@@ -163,6 +163,8 @@ export default function ProfileSettings() {
           <p className="text-slate-400">Manage your account information and preferences</p>
         </motion.div>
 
+        <UserInfoDisplay />
+
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Profile Picture Section */}
           <motion.div
