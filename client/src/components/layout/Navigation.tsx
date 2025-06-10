@@ -3,11 +3,13 @@ import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { NAVIGATION_ITEMS } from "@/lib/constants";
+import UserProfileDropdown from "@/components/ui/user-profile-dropdown";
 
 const Navigation = () => {
   const [location, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(true); // Mock auth state - in real app this would come from auth context
 
   const isActive = (path: string) => location === path;
   const isDropdownActive = (dropdown: readonly any[]) => dropdown.some(item => location === item.path);
@@ -108,24 +110,30 @@ const Navigation = () => {
                 </div>
               ))}
               
-              {/* Auth Buttons */}
+              {/* Auth Section */}
               <div className="ml-4 flex items-center space-x-3">
-                <motion.button
-                  className="px-4 py-2 text-white hover:text-blue-400 transition-colors"
-                  onClick={() => handleNavigation('/login')}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Login
-                </motion.button>
-                <motion.button
-                  className="glassmorphism-button px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-blue-500 to-green-500"
-                  onClick={() => handleNavigation('/signup')}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Sign Up
-                </motion.button>
+                {isAuthenticated ? (
+                  <UserProfileDropdown />
+                ) : (
+                  <>
+                    <motion.button
+                      className="px-4 py-2 text-white hover:text-blue-400 transition-colors"
+                      onClick={() => handleNavigation('/login')}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Login
+                    </motion.button>
+                    <motion.button
+                      className="glassmorphism-button px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-blue-500 to-green-500"
+                      onClick={() => handleNavigation('/signup')}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Sign Up
+                    </motion.button>
+                  </>
+                )}
               </div>
             </div>
             
@@ -205,19 +213,27 @@ const Navigation = () => {
                     )}
                   </div>
                 ))}
-                <div className="flex space-x-2 mt-4">
-                  <button
-                    className="flex-1 px-4 py-3 rounded-lg font-semibold text-white border border-white/20 hover:bg-white/10 transition-colors"
-                    onClick={() => handleNavigation('/login')}
-                  >
-                    Login
-                  </button>
-                  <button
-                    className="flex-1 glassmorphism-button px-4 py-3 rounded-lg font-semibold bg-gradient-to-r from-blue-500 to-green-500"
-                    onClick={() => handleNavigation('/signup')}
-                  >
-                    Sign Up
-                  </button>
+                <div className="mt-4">
+                  {isAuthenticated ? (
+                    <div className="border-t border-white/10 pt-4">
+                      <UserProfileDropdown className="w-full" />
+                    </div>
+                  ) : (
+                    <div className="flex space-x-2">
+                      <button
+                        className="flex-1 px-4 py-3 rounded-lg font-semibold text-white border border-white/20 hover:bg-white/10 transition-colors"
+                        onClick={() => handleNavigation('/login')}
+                      >
+                        Login
+                      </button>
+                      <button
+                        className="flex-1 glassmorphism-button px-4 py-3 rounded-lg font-semibold bg-gradient-to-r from-blue-500 to-green-500"
+                        onClick={() => handleNavigation('/signup')}
+                      >
+                        Sign Up
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>

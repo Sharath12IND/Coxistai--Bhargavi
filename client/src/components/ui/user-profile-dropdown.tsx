@@ -1,0 +1,248 @@
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  User, 
+  Settings, 
+  LogOut, 
+  Crown, 
+  Camera, 
+  ChevronDown,
+  Bell,
+  CreditCard,
+  Shield
+} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+
+interface UserProfileDropdownProps {
+  className?: string;
+}
+
+// Mock user data - in real app this would come from authentication context
+const mockUser = {
+  name: "Alex Johnson",
+  email: "alex.johnson@email.com",
+  avatar: null as string | null, // User can upload their own
+  subscription: {
+    plan: "Pro",
+    status: "active",
+    expiresAt: "2024-07-15",
+    features: ["Unlimited AI Tutoring", "Premium Templates", "Advanced Analytics"]
+  },
+  settings: {
+    notifications: true,
+    theme: "dark"
+  }
+};
+
+export default function UserProfileDropdown({ className = "" }: UserProfileDropdownProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState(mockUser);
+
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result;
+        if (typeof result === 'string') {
+          setUser(prev => ({
+            ...prev,
+            avatar: result
+          }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleLogout = () => {
+    // In real app, this would clear authentication and redirect to login
+    console.log("Logging out...");
+    setIsOpen(false);
+  };
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+
+  const getPlanColor = (plan: string) => {
+    switch (plan.toLowerCase()) {
+      case 'pro': return 'bg-gradient-to-r from-purple-500 to-pink-500';
+      case 'premium': return 'bg-gradient-to-r from-yellow-500 to-orange-500';
+      default: return 'bg-gradient-to-r from-blue-500 to-green-500';
+    }
+  };
+
+  return (
+    <div className={`relative ${className}`}>
+      <motion.button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center space-x-3 p-2 rounded-xl glassmorphism hover:bg-white/10 transition-all duration-200"
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        <Avatar className="w-8 h-8 ring-2 ring-blue-500/30">
+          <AvatarImage src={user.avatar || undefined} alt={user.name} />
+          <AvatarFallback className="bg-gradient-to-r from-blue-500 to-green-500 text-white text-sm font-semibold">
+            {getInitials(user.name)}
+          </AvatarFallback>
+        </Avatar>
+        <div className="hidden sm:block text-left">
+          <div className="text-sm font-medium text-white">{user.name}</div>
+          <div className="text-xs text-slate-400">{user.subscription.plan} Plan</div>
+        </div>
+        <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+          isOpen ? 'rotate-180' : ''
+        }`} />
+      </motion.button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 z-40"
+              onClick={() => setIsOpen(false)}
+            />
+            
+            {/* Dropdown */}
+            <motion.div
+              className="absolute top-full right-0 mt-2 w-80 glassmorphism-strong rounded-xl border border-white/10 shadow-2xl overflow-hidden z-50"
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+            >
+              {/* User Info Section */}
+              <div className="p-4 bg-gradient-to-r from-blue-500/10 to-green-500/10">
+                <div className="flex items-center space-x-3">
+                  <div className="relative">
+                    <Avatar className="w-12 h-12 ring-2 ring-blue-500/30">
+                      <AvatarImage src={user.avatar || undefined} alt={user.name} />
+                      <AvatarFallback className="bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold">
+                        {getInitials(user.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <label className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center cursor-pointer hover:bg-blue-600 transition-colors">
+                      <Camera className="w-3 h-3 text-white" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAvatarChange}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-semibold text-white">{user.name}</div>
+                    <div className="text-sm text-slate-400">{user.email}</div>
+                    <Badge className={`mt-1 text-xs ${getPlanColor(user.subscription.plan)} text-white border-0`}>
+                      <Crown className="w-3 h-3 mr-1" />
+                      {user.subscription.plan} Plan
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+
+              <Separator className="bg-white/10" />
+
+              {/* Subscription Details */}
+              <div className="p-4">
+                <div className="text-sm font-medium text-white mb-2">Subscription Details</div>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-slate-400">Status</span>
+                    <Badge variant="outline" className="text-green-400 border-green-400/30">
+                      {user.subscription.status}
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-slate-400">Expires</span>
+                    <span className="text-white">{user.subscription.expiresAt}</span>
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <div className="text-xs text-slate-400 mb-1">Features</div>
+                  <div className="flex flex-wrap gap-1">
+                    {user.subscription.features.map((feature, index) => (
+                      <Badge key={index} variant="secondary" className="text-xs bg-white/5 text-slate-300">
+                        {feature}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <Separator className="bg-white/10" />
+
+              {/* Menu Items */}
+              <div className="p-2">
+                <motion.button
+                  className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-left"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <User className="w-4 h-4 text-slate-400" />
+                  <span className="text-white">Profile Settings</span>
+                </motion.button>
+
+                <motion.button
+                  className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-left"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <CreditCard className="w-4 h-4 text-slate-400" />
+                  <span className="text-white">Billing & Subscription</span>
+                </motion.button>
+
+                <motion.button
+                  className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-left"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Bell className="w-4 h-4 text-slate-400" />
+                  <span className="text-white">Notifications</span>
+                  <div className="ml-auto">
+                    <div className={`w-2 h-2 rounded-full ${user.settings.notifications ? 'bg-green-400' : 'bg-gray-400'}`} />
+                  </div>
+                </motion.button>
+
+                <motion.button
+                  className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-left"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Shield className="w-4 h-4 text-slate-400" />
+                  <span className="text-white">Privacy & Security</span>
+                </motion.button>
+
+                <motion.button
+                  className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-left"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Settings className="w-4 h-4 text-slate-400" />
+                  <span className="text-white">General Settings</span>
+                </motion.button>
+
+                <Separator className="bg-white/10 my-2" />
+
+                <motion.button
+                  onClick={handleLogout}
+                  className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-red-500/20 transition-colors text-left group"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <LogOut className="w-4 h-4 text-red-400" />
+                  <span className="text-red-400 group-hover:text-red-300">Log Out</span>
+                </motion.button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
