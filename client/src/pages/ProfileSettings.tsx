@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   User, 
@@ -11,7 +11,9 @@ import {
   Edit,
   Shield,
   Bell,
-  Globe
+  Globe,
+  Moon,
+  Sun
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -21,23 +23,27 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useLoading } from "@/contexts/LoadingContext";
+import { useUser } from "@/contexts/UserContext";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function ProfileSettings() {
   const { toast } = useToast();
   const { showLoader, hideLoader } = useLoading();
+  const { user, updateProfile, isLoading } = useUser();
+  const { theme, setTheme, toggleTheme } = useTheme();
 
   const [profileData, setProfileData] = useState({
-    firstName: "Alex",
-    lastName: "Johnson",
-    email: "alex.johnson@email.com",
-    phone: "+1 (555) 123-4567",
-    bio: "AI enthusiast and lifelong learner passionate about technology and education.",
-    location: "San Francisco, CA",
-    timezone: "America/Los_Angeles",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    bio: "",
+    location: "",
+    timezone: "",
     avatar: null as string | null,
-    dateOfBirth: "1995-06-15",
-    occupation: "Software Engineer",
-    company: "Tech Innovations Inc."
+    dateOfBirth: "",
+    occupation: "",
+    company: ""
   });
 
   const [preferences, setPreferences] = useState({
@@ -45,10 +51,42 @@ export default function ProfileSettings() {
     pushNotifications: true,
     marketingEmails: false,
     weeklyDigest: true,
-    darkMode: true,
     language: "en",
     publicProfile: false
   });
+
+  // Update local state when user data loads
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        bio: user.bio || "",
+        location: user.location || "",
+        timezone: user.timezone || "",
+        avatar: user.avatar,
+        dateOfBirth: user.dateOfBirth || "",
+        occupation: user.occupation || "",
+        company: user.company || "",
+      });
+
+      setPreferences({
+        emailNotifications: user.emailNotifications ?? true,
+        pushNotifications: user.pushNotifications ?? true,
+        marketingEmails: user.marketingEmails ?? false,
+        weeklyDigest: user.weeklyDigest ?? true,
+        language: user.language || "en",
+        publicProfile: user.publicProfile ?? false,
+      });
+
+      // Sync theme with user preference
+      if (user.theme && user.theme !== theme) {
+        setTheme(user.theme as 'light' | 'dark');
+      }
+    }
+  }, [user, theme, setTheme]);
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -65,16 +103,42 @@ export default function ProfileSettings() {
   };
 
   const handleSaveProfile = async () => {
-    showLoader("Saving your profile...");
-    
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      showLoader("Saving your profile...");
+      
+      const updatedProfileData = {
+        ...profileData,
+        ...preferences,
+        theme,
+      };
+
+      await updateProfile(updatedProfileData);
+      
       hideLoader();
       toast({
         title: "Profile Updated",
         description: "Your profile has been successfully updated.",
       });
-    }, 2000);
+    } catch (error) {
+      hideLoader();
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleThemeToggle = async () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    
+    // Update user preference in database
+    try {
+      await updateProfile({ theme: newTheme });
+    } catch (error) {
+      console.error('Failed to update theme preference:', error);
+    }
   };
 
   const getInitials = (firstName: string, lastName: string) => {

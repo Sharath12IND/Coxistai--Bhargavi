@@ -510,10 +510,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/users/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const user = await storage.getUser(id);
+      let user = await storage.getUser(id);
       
       if (!user) {
-        return res.status(404).json({ error: "User not found" });
+        // Create default user if doesn't exist
+        const defaultUser = {
+          username: `user${id}`,
+          password: 'default123',
+          firstName: 'Alex',
+          lastName: 'Johnson',
+          email: 'alex.johnson@email.com',
+          phone: '+1 (555) 123-4567',
+          bio: 'AI enthusiast and lifelong learner passionate about technology and education.',
+          location: 'San Francisco, CA',
+          timezone: 'America/Los_Angeles',
+          avatar: null,
+          dateOfBirth: '1995-06-15',
+          occupation: 'Software Engineer',
+          company: 'Tech Innovations Inc.',
+          theme: 'dark',
+          emailNotifications: true,
+          pushNotifications: true,
+          marketingEmails: false,
+          weeklyDigest: true,
+          language: 'en',
+          publicProfile: false,
+        };
+        
+        const { firstName, lastName, email, phone, bio, location, timezone, avatar, dateOfBirth, occupation, company, theme, emailNotifications, pushNotifications, marketingEmails, weeklyDigest, language, publicProfile, ...userCreds } = defaultUser;
+        const createdUser = await storage.createUser(userCreds);
+        
+        // Update the user with profile data
+        user = await storage.updateUserProfile(createdUser.id, {
+          firstName, lastName, email, phone, bio, location, timezone, avatar, dateOfBirth, occupation, company, theme, emailNotifications, pushNotifications, marketingEmails, weeklyDigest, language, publicProfile
+        });
       }
       
       // Remove password from response

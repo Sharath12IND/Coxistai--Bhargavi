@@ -21,6 +21,7 @@ import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import ForgotPassword from "@/pages/ForgotPassword";
 import LoadingDemo from "@/pages/LoadingDemo";
+import ProfileSettings from "@/pages/ProfileSettings";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -38,6 +39,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/signup" component={Signup} />
       <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/profile" component={ProfileSettings} />
       <Route path="/demo" component={LoadingDemo} />
       <Route component={NotFound} />
     </Switch>
@@ -47,16 +49,20 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <LoadingProvider>
-          <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden">
-            <AnimatedBackground />
-            <Navigation />
-            <Router />
-            <Toaster />
-          </div>
-        </LoadingProvider>
-      </TooltipProvider>
+      <ThemeProvider>
+        <UserProvider>
+          <TooltipProvider>
+            <LoadingProvider>
+              <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden">
+                <AnimatedBackground />
+                <Navigation />
+                <Router />
+                <Toaster />
+              </div>
+            </LoadingProvider>
+          </TooltipProvider>
+        </UserProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
