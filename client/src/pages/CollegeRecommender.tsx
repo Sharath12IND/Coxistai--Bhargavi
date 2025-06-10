@@ -373,10 +373,11 @@ const COLLEGES: College[] = [
 export default function CollegeRecommender() {
   const [filters, setFilters] = useState({
     satScore: 0,
+    actScore: 0,
     gpa: 0,
-    major: "",
-    state: "",
-    type: "",
+    major: "any",
+    state: "any",
+    type: "any",
     maxTuition: 60000,
     minAcceptanceRate: 0,
     searchTerm: ""
@@ -386,15 +387,22 @@ export default function CollegeRecommender() {
 
   const filteredColleges = useMemo(() => {
     return COLLEGES.filter(college => {
-      // SAT Score filter
-      if (filters.satScore > 0 && 
-          (filters.satScore < college.satRange[0] || filters.satScore > college.satRange[1])) {
-        return false;
+      // SAT Score filter - more inclusive approach
+      if (filters.satScore > 0) {
+        const isInRange = filters.satScore >= college.satRange[0] - 100 && filters.satScore <= college.satRange[1] + 50;
+        if (!isInRange) return false;
       }
 
-      // GPA filter
-      if (filters.gpa > 0 && filters.gpa < college.gpaRange[0]) {
-        return false;
+      // ACT Score filter - more inclusive approach  
+      if (filters.actScore > 0) {
+        const isInRange = filters.actScore >= college.actRange[0] - 2 && filters.actScore <= college.actRange[1] + 1;
+        if (!isInRange) return false;
+      }
+
+      // GPA filter - more inclusive approach
+      if (filters.gpa > 0) {
+        const isInRange = filters.gpa >= college.gpaRange[0] - 0.3;
+        if (!isInRange) return false;
       }
 
       // Major filter
@@ -431,39 +439,71 @@ export default function CollegeRecommender() {
       }
 
       return true;
-    }).sort((a, b) => a.ranking - b.ranking);
+    }).sort((a, b) => {
+      // Sort by match score first, then by ranking
+      const scoreA = getMatchScore(a);
+      const scoreB = getMatchScore(b);
+      if (scoreB !== scoreA) {
+        return scoreB - scoreA; // Higher score first
+      }
+      return a.ranking - b.ranking; // Lower ranking number first
+    });
   }, [filters]);
 
   const getMatchScore = (college: College) => {
     let score = 0;
     
-    // SAT score match
+    // Test score match (SAT or ACT)
+    let testScoreBonus = 0;
     if (filters.satScore > 0) {
       if (filters.satScore >= college.satRange[0] && filters.satScore <= college.satRange[1]) {
-        score += 30;
+        testScoreBonus = 30; // Perfect match
+      } else if (filters.satScore >= college.satRange[0] - 50) {
+        testScoreBonus = 25; // Close match
       } else if (filters.satScore >= college.satRange[0] - 100) {
-        score += 15;
+        testScoreBonus = 15; // Reach school
+      } else if (filters.satScore >= college.satRange[0] - 150) {
+        testScoreBonus = 5; // Big reach
       }
     }
+    
+    if (filters.actScore > 0) {
+      if (filters.actScore >= college.actRange[0] && filters.actScore <= college.actRange[1]) {
+        testScoreBonus = Math.max(testScoreBonus, 30); // Perfect match
+      } else if (filters.actScore >= college.actRange[0] - 1) {
+        testScoreBonus = Math.max(testScoreBonus, 25); // Close match
+      } else if (filters.actScore >= college.actRange[0] - 2) {
+        testScoreBonus = Math.max(testScoreBonus, 15); // Reach school
+      } else if (filters.actScore >= college.actRange[0] - 3) {
+        testScoreBonus = Math.max(testScoreBonus, 5); // Big reach
+      }
+    }
+    score += testScoreBonus;
 
     // GPA match
     if (filters.gpa > 0) {
       if (filters.gpa >= college.gpaRange[0]) {
-        score += 25;
+        score += 25; // Meets or exceeds requirement
+      } else if (filters.gpa >= college.gpaRange[0] - 0.1) {
+        score += 20; // Very close
+      } else if (filters.gpa >= college.gpaRange[0] - 0.2) {
+        score += 15; // Close
       } else if (filters.gpa >= college.gpaRange[0] - 0.3) {
-        score += 10;
+        score += 10; // Reach
       }
     }
 
     // Major match
-    if (filters.major && college.majors.some(major => 
+    if (filters.major && filters.major !== "any" && college.majors.some(major => 
       major.toLowerCase().includes(filters.major.toLowerCase()))) {
       score += 20;
     }
 
-    // Acceptance rate bonus for safety schools
+    // Acceptance rate considerations
     if (college.acceptanceRate > 30) {
-      score += 10;
+      score += 10; // Safety school bonus
+    } else if (college.acceptanceRate < 10) {
+      score -= 5; // Highly competitive penalty
     }
 
     // Ranking bonus
@@ -471,6 +511,8 @@ export default function CollegeRecommender() {
       score += 15;
     } else if (college.ranking <= 25) {
       score += 10;
+    } else if (college.ranking <= 50) {
+      score += 5;
     }
 
     return Math.min(score, 100);
@@ -534,7 +576,7 @@ export default function CollegeRecommender() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700"
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700"
                 >
                   <div>
                     <Label className="text-sm font-medium mb-2 block">SAT Score</Label>
@@ -543,6 +585,16 @@ export default function CollegeRecommender() {
                       placeholder="1600"
                       value={filters.satScore || ""}
                       onChange={(e) => setFilters({ ...filters, satScore: parseInt(e.target.value) || 0 })}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">ACT Score</Label>
+                    <Input
+                      type="number"
+                      placeholder="36"
+                      value={filters.actScore || ""}
+                      onChange={(e) => setFilters({ ...filters, actScore: parseInt(e.target.value) || 0 })}
                     />
                   </div>
                   
@@ -643,6 +695,7 @@ export default function CollegeRecommender() {
                     <Button
                       onClick={() => setFilters({
                         satScore: 0,
+                        actScore: 0,
                         gpa: 0,
                         major: "any",
                         state: "any",
