@@ -398,18 +398,18 @@ export default function CollegeRecommender() {
       }
 
       // Major filter
-      if (filters.major && !college.majors.some(major => 
+      if (filters.major && filters.major !== "any" && !college.majors.some(major => 
         major.toLowerCase().includes(filters.major.toLowerCase()))) {
         return false;
       }
 
       // State filter
-      if (filters.state && college.state !== filters.state) {
+      if (filters.state && filters.state !== "any" && college.state !== filters.state) {
         return false;
       }
 
       // Type filter
-      if (filters.type && college.type !== filters.type) {
+      if (filters.type && filters.type !== "any" && college.type !== filters.type) {
         return false;
       }
 
@@ -564,7 +564,7 @@ export default function CollegeRecommender() {
                         <SelectValue placeholder="Select major" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Any Major</SelectItem>
+                        <SelectItem value="any">Any Major</SelectItem>
                         <SelectItem value="Computer Science">Computer Science</SelectItem>
                         <SelectItem value="Engineering">Engineering</SelectItem>
                         <SelectItem value="Business">Business</SelectItem>
@@ -586,7 +586,7 @@ export default function CollegeRecommender() {
                         <SelectValue placeholder="Select state" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Any State</SelectItem>
+                        <SelectItem value="any">Any State</SelectItem>
                         <SelectItem value="California">California</SelectItem>
                         <SelectItem value="Massachusetts">Massachusetts</SelectItem>
                         <SelectItem value="New York">New York</SelectItem>
@@ -608,7 +608,7 @@ export default function CollegeRecommender() {
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Any Type</SelectItem>
+                        <SelectItem value="any">Any Type</SelectItem>
                         <SelectItem value="Public">Public</SelectItem>
                         <SelectItem value="Private">Private</SelectItem>
                       </SelectContent>
@@ -644,9 +644,9 @@ export default function CollegeRecommender() {
                       onClick={() => setFilters({
                         satScore: 0,
                         gpa: 0,
-                        major: "",
-                        state: "",
-                        type: "",
+                        major: "any",
+                        state: "any",
+                        type: "any",
                         maxTuition: 60000,
                         minAcceptanceRate: 0,
                         searchTerm: ""
