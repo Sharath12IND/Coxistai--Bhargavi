@@ -6,6 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Navigation from "@/components/layout/Navigation";
 import AnimatedBackground from "@/components/layout/AnimatedBackground";
 import { LoadingProvider } from "@/contexts/LoadingContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { UserProvider } from "@/contexts/UserContext";
 import Home from "@/pages/Home";
 import SparkTutorChat from "@/pages/SparkTutorChat";
 import NotesHub from "@/pages/NotesHub";
