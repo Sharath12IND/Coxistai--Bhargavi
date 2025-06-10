@@ -162,29 +162,21 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
 
               <Separator className="bg-white/10" />
 
-              {/* Subscription Details */}
+              {/* User Details */}
               <div className="p-4">
-                <div className="text-sm font-medium text-white mb-2">Subscription Details</div>
+                <div className="text-sm font-medium text-white mb-2">Account Details</div>
                 <div className="space-y-2">
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-400">Status</span>
-                    <Badge variant="outline" className="text-green-400 border-green-400/30">
-                      {user.subscription.status}
-                    </Badge>
+                    <span className="text-slate-400">Occupation</span>
+                    <span className="text-white">{user.occupation || 'Not set'}</span>
                   </div>
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-400">Expires</span>
-                    <span className="text-white">{user.subscription.expiresAt}</span>
+                    <span className="text-slate-400">Location</span>
+                    <span className="text-white">{user.location || 'Not set'}</span>
                   </div>
-                </div>
-                <div className="mt-3">
-                  <div className="text-xs text-slate-400 mb-1">Features</div>
-                  <div className="flex flex-wrap gap-1">
-                    {user.subscription.features.map((feature, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs bg-white/5 text-slate-300">
-                        {feature}
-                      </Badge>
-                    ))}
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-slate-400">Theme</span>
+                    <span className="text-white capitalize">{user.theme || 'dark'}</span>
                   </div>
                 </div>
               </div>
@@ -194,7 +186,7 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
               {/* Menu Items */}
               <div className="p-2">
                 <motion.button
-                  onClick={() => navigateTo('/profile-settings')}
+                  onClick={() => navigateTo('/profile')}
                   className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-left"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -222,7 +214,7 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
                   <Bell className="w-4 h-4 text-slate-400" />
                   <span className="text-white">Notifications</span>
                   <div className="ml-auto">
-                    <div className={`w-2 h-2 rounded-full ${user.settings.notifications ? 'bg-green-400' : 'bg-gray-400'}`} />
+                    <div className={`w-2 h-2 rounded-full ${user.emailNotifications ? 'bg-green-400' : 'bg-gray-400'}`} />
                   </div>
                 </motion.button>
 
