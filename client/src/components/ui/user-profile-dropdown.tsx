@@ -78,17 +78,7 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
   };
 
   if (!user) {
-    return (
-      <div className={`relative ${className}`}>
-        <div className="flex items-center space-x-3 p-2 rounded-xl glassmorphism">
-          <div className="w-8 h-8 bg-slate-700 rounded-full animate-pulse"></div>
-          <div className="hidden sm:block">
-            <div className="w-20 h-3 bg-slate-700 rounded animate-pulse mb-1"></div>
-            <div className="w-16 h-2 bg-slate-700 rounded animate-pulse"></div>
-          </div>
-        </div>
-      </div>
-    );
+    return null; // Don't render anything if no user
   }
 
   return (
