@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Navigation from "@/components/layout/Navigation";
 import AnimatedBackground from "@/components/layout/AnimatedBackground";
+import { LoadingProvider } from "@/contexts/LoadingContext";
 import Home from "@/pages/Home";
 import SparkTutorChat from "@/pages/SparkTutorChat";
 import NotesHub from "@/pages/NotesHub";
