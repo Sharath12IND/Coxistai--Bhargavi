@@ -11,9 +11,7 @@ import {
   Edit,
   Shield,
   Bell,
-  Globe,
-  Moon,
-  Sun
+  Globe
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -24,14 +22,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useLoading } from "@/contexts/LoadingContext";
 import { useUser } from "@/contexts/UserContext";
-import { useTheme } from "@/contexts/ThemeContext";
 import UserInfoDisplay from "@/components/ui/user-info-display";
 
 export default function ProfileSettings() {
   const { toast } = useToast();
   const { showLoader, hideLoader } = useLoading();
   const { user, updateProfile, isLoading } = useUser();
-  const { theme, setTheme, toggleTheme } = useTheme();
 
   const [profileData, setProfileData] = useState({
     firstName: "",
@@ -82,12 +78,8 @@ export default function ProfileSettings() {
         publicProfile: user.publicProfile ?? false,
       });
 
-      // Sync theme with user preference
-      if (user.theme && user.theme !== theme) {
-        setTheme(user.theme as 'light' | 'dark');
-      }
     }
-  }, [user, theme, setTheme]);
+  }, [user]);
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -110,7 +102,6 @@ export default function ProfileSettings() {
       const updatedProfileData = {
         ...profileData,
         ...preferences,
-        theme,
       };
 
       await updateProfile(updatedProfileData);
@@ -130,17 +121,7 @@ export default function ProfileSettings() {
     }
   };
 
-  const handleThemeToggle = async () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
-    
-    // Update user preference in database
-    try {
-      await updateProfile({ theme: newTheme });
-    } catch (error) {
-      console.error('Failed to update theme preference:', error);
-    }
-  };
+
 
   const getInitials = (firstName: string, lastName: string) => {
     return `${firstName[0]}${lastName[0]}`.toUpperCase();
@@ -292,28 +273,7 @@ export default function ProfileSettings() {
               </div>
             </div>
 
-            {/* Appearance */}
-            <div className="glassmorphism p-6 rounded-xl">
-              <h2 className="text-xl font-bold text-white mb-4 flex items-center">
-                <Globe className="w-5 h-5 mr-2" />
-                Appearance
-              </h2>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium text-white flex items-center">
-                      {theme === 'dark' ? <Moon className="w-4 h-4 mr-2" /> : <Sun className="w-4 h-4 mr-2" />}
-                      Theme
-                    </h3>
-                    <p className="text-sm text-slate-400">Choose between light and dark mode</p>
-                  </div>
-                  <Switch
-                    checked={theme === 'dark'}
-                    onCheckedChange={handleThemeToggle}
-                  />
-                </div>
-              </div>
-            </div>
+
 
             {/* Preferences */}
             <div className="glassmorphism p-6 rounded-xl">
