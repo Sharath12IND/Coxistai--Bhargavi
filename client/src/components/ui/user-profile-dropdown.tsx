@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocation } from "wouter";
 import { 
   User, 
   Settings, 
@@ -14,6 +15,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { LogoutDialog } from "@/components/ui/logout-dialog";
 
 interface UserProfileDropdownProps {
   className?: string;
@@ -37,8 +39,10 @@ const mockUser = {
 };
 
 export default function UserProfileDropdown({ className = "" }: UserProfileDropdownProps) {
+  const [, setLocation] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(mockUser);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -58,8 +62,18 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
   };
 
   const handleLogout = () => {
+    setShowLogoutDialog(true);
+    setIsOpen(false);
+  };
+
+  const confirmLogout = () => {
     // In real app, this would clear authentication and redirect to login
-    console.log("Logging out...");
+    setShowLogoutDialog(false);
+    setLocation('/login');
+  };
+
+  const navigateTo = (path: string) => {
+    setLocation(path);
     setIsOpen(false);
   };
 
@@ -180,6 +194,7 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
               {/* Menu Items */}
               <div className="p-2">
                 <motion.button
+                  onClick={() => navigateTo('/profile-settings')}
                   className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-left"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -189,6 +204,7 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
                 </motion.button>
 
                 <motion.button
+                  onClick={() => navigateTo('/billing')}
                   className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-left"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -198,6 +214,7 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
                 </motion.button>
 
                 <motion.button
+                  onClick={() => navigateTo('/notifications')}
                   className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-left"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -210,6 +227,7 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
                 </motion.button>
 
                 <motion.button
+                  onClick={() => navigateTo('/privacy')}
                   className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-left"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -219,6 +237,7 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
                 </motion.button>
 
                 <motion.button
+                  onClick={() => navigateTo('/settings')}
                   className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-white/10 transition-colors text-left"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -243,6 +262,13 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
           </>
         )}
       </AnimatePresence>
+      
+      {/* Logout Confirmation Dialog */}
+      <LogoutDialog 
+        open={showLogoutDialog}
+        onOpenChange={setShowLogoutDialog}
+        onConfirm={confirmLogout}
+      />
     </div>
   );
 }
