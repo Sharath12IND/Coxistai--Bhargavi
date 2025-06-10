@@ -492,10 +492,10 @@ export default function CollegeRecommender() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-4xl font-bold text-foreground mb-2">
             College Finder
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-muted-foreground">
             Find colleges that match your academic profile and preferences
           </p>
         </motion.div>
@@ -665,7 +665,7 @@ export default function CollegeRecommender() {
 
         {/* Results Summary */}
         <div className="mb-6">
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-muted-foreground">
             Found {filteredColleges.length} colleges matching your criteria
           </p>
         </div>

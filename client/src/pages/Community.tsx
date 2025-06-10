@@ -317,10 +317,10 @@ export default function Community() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-4xl font-bold text-foreground mb-2">
             Learning Community
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-muted-foreground">
             Connect, learn, and grow together with fellow students
           </p>
         </motion.div>
@@ -335,32 +335,32 @@ export default function Community() {
           <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-white/20 dark:border-gray-700/30">
             <CardContent className="p-4 text-center">
               <Users className="h-8 w-8 mx-auto mb-2 text-blue-500" />
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">2,847</div>
-              <div className="text-sm text-gray-600 dark:text-gray-300">Active Members</div>
+              <div className="text-2xl font-bold text-foreground">2,847</div>
+              <div className="text-sm text-muted-foreground">Active Members</div>
             </CardContent>
           </Card>
           
           <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-white/20 dark:border-gray-700/30">
             <CardContent className="p-4 text-center">
               <MessageSquare className="h-8 w-8 mx-auto mb-2 text-green-500" />
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">1,234</div>
-              <div className="text-sm text-gray-600 dark:text-gray-300">Discussions</div>
+              <div className="text-2xl font-bold text-foreground">1,234</div>
+              <div className="text-sm text-muted-foreground">Discussions</div>
             </CardContent>
           </Card>
           
           <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-white/20 dark:border-gray-700/30">
             <CardContent className="p-4 text-center">
               <BookOpen className="h-8 w-8 mx-auto mb-2 text-purple-500" />
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">456</div>
-              <div className="text-sm text-gray-600 dark:text-gray-300">Study Groups</div>
+              <div className="text-2xl font-bold text-foreground">456</div>
+              <div className="text-sm text-muted-foreground">Study Groups</div>
             </CardContent>
           </Card>
           
           <Card className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border-white/20 dark:border-gray-700/30">
             <CardContent className="p-4 text-center">
               <Trophy className="h-8 w-8 mx-auto mb-2 text-yellow-500" />
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">89%</div>
-              <div className="text-sm text-gray-600 dark:text-gray-300">Success Rate</div>
+              <div className="text-2xl font-bold text-foreground">89%</div>
+              <div className="text-sm text-muted-foreground">Success Rate</div>
             </CardContent>
           </Card>
         </motion.div>

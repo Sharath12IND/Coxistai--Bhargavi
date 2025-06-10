@@ -4,6 +4,39 @@
 @tailwind utilities;
 
 :root {
+  /* Light mode variables */
+  --background: 0 0% 100%; /* #ffffff */
+  --foreground: 222 84% 5%; /* #0a0a0a */
+  --card: 0 0% 100%; /* #ffffff */
+  --card-foreground: 222 84% 5%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 84% 5%;
+  --primary: 218 94% 59%; /* #3a86ff */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 40% 98%; /* #f8fafc */
+  --secondary-foreground: 222 84% 5%;
+  --muted: 210 40% 96%; /* #f1f5f9 */
+  --muted-foreground: 215 16% 47%; /* #64748b */
+  --accent: 165 94% 43%; /* #06d6a0 */
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 214 32% 91%; /* #e2e8f0 */
+  --input: 214 32% 91%;
+  --ring: 218 94% 59%;
+  --radius: 0.75rem;
+  
+  /* Custom colors for light mode */
+  --primary-bg: 0 0% 100%; /* #ffffff */
+  --card-bg: 0 0% 100%; /* #ffffff */
+  --accent-blue: 218 94% 59%; /* #3a86ff */
+  --mint-green: 165 94% 43%; /* #06d6a0 */
+  --text-primary: 222 84% 5%; /* #0a0a0a */
+  --text-secondary: 215 16% 47%; /* #64748b */
+}
+
+.dark {
+  /* Dark mode variables */
   --background: 240 10% 6%; /* #0f0f1a */
   --foreground: 0 0% 100%; /* #ffffff */
   --card: 240 10% 13%; /* #21223a */
@@ -23,9 +56,8 @@
   --border: 240 3% 15%;
   --input: 240 3% 15%;
   --ring: 218 94% 59%;
-  --radius: 0.75rem;
   
-  /* Custom colors */
+  /* Custom colors for dark mode */
   --primary-bg: 240 10% 6%; /* #0f0f1a */
   --card-bg: 240 10% 13%; /* #21223a */
   --accent-blue: 218 94% 59%; /* #3a86ff */
