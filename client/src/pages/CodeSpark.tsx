@@ -58,6 +58,8 @@ int main() {
   const [isRunning, setIsRunning] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("python");
   const [error, setError] = useState("");
+  const [userInput, setUserInput] = useState("");
+  const [executionTime, setExecutionTime] = useState(0);
   const [showAddCourseDialog, setShowAddCourseDialog] = useState(false);
   const [customCourse, setCustomCourse] = useState({ name: "", query: "" });
   const [searchQuery, setSearchQuery] = useState("");

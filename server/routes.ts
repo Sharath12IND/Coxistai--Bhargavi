@@ -3,6 +3,385 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertDocumentSchema } from "@shared/schema";
 import multer from "multer";
+import { exec, spawn } from "child_process";
+import fs from "fs/promises";
+import path from "path";
+import { promisify } from "util";
+
+const execAsync = promisify(exec);
+
+async function executeCode(code: string, language: string, input: string, tempDir: string, executionId: string) {
+  const timeout = 10000; // 10 seconds timeout
+  
+  try {
+    switch (language) {
+      case "python":
+        return await executePython(code, input, tempDir, executionId, timeout);
+      case "javascript":
+        return await executeJavaScript(code, input, tempDir, executionId, timeout);
+      case "c":
+        return await executeC(code, input, tempDir, executionId, timeout);
+      case "cpp":
+        return await executeCpp(code, input, tempDir, executionId, timeout);
+      case "java":
+        return await executeJava(code, input, tempDir, executionId, timeout);
+      default:
+        throw new Error(`Unsupported language: ${language}`);
+    }
+  } catch (error) {
+    return {
+      output: "",
+      error: error instanceof Error ? error.message : "Execution failed",
+      executionTime: 0
+    };
+  }
+}
+
+async function executePython(code: string, input: string, tempDir: string, executionId: string, timeout: number) {
+  const fileName = `${executionId}.py`;
+  const filePath = path.join(tempDir, fileName);
+  
+  await fs.writeFile(filePath, code);
+  
+  return new Promise((resolve) => {
+    const startTime = Date.now();
+    const child = spawn("python3", [filePath], {
+      cwd: tempDir,
+      stdio: ["pipe", "pipe", "pipe"]
+    });
+    
+    let output = "";
+    let errorOutput = "";
+    
+    child.stdout.on("data", (data) => {
+      output += data.toString();
+    });
+    
+    child.stderr.on("data", (data) => {
+      errorOutput += data.toString();
+    });
+    
+    // Send input if provided
+    if (input) {
+      child.stdin.write(input);
+      child.stdin.end();
+    }
+    
+    const timeoutId = setTimeout(() => {
+      child.kill("SIGKILL");
+      resolve({
+        output: output,
+        error: "Execution timeout (10 seconds)",
+        executionTime: Date.now() - startTime
+      });
+    }, timeout);
+    
+    child.on("close", (code) => {
+      clearTimeout(timeoutId);
+      fs.unlink(filePath).catch(() => {}); // Clean up file
+      
+      resolve({
+        output: output,
+        error: errorOutput || (code !== 0 ? `Process exited with code ${code}` : ""),
+        executionTime: Date.now() - startTime
+      });
+    });
+  });
+}
+
+async function executeJavaScript(code: string, input: string, tempDir: string, executionId: string, timeout: number) {
+  const fileName = `${executionId}.js`;
+  const filePath = path.join(tempDir, fileName);
+  
+  // Wrap code to handle input
+  const wrappedCode = `
+const readline = require('readline');
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+let inputLines = \`${input}\`.split('\\n').filter(line => line.trim() !== '');
+let inputIndex = 0;
+
+// Override console.log to handle input simulation
+const originalLog = console.log;
+global.prompt = function(question) {
+  if (inputIndex < inputLines.length) {
+    const answer = inputLines[inputIndex++];
+    originalLog(question + answer);
+    return answer;
+  }
+  return '';
+};
+
+${code}
+
+rl.close();
+`;
+  
+  await fs.writeFile(filePath, wrappedCode);
+  
+  return new Promise((resolve) => {
+    const startTime = Date.now();
+    const child = spawn("node", [filePath], {
+      cwd: tempDir,
+      stdio: ["pipe", "pipe", "pipe"]
+    });
+    
+    let output = "";
+    let errorOutput = "";
+    
+    child.stdout.on("data", (data) => {
+      output += data.toString();
+    });
+    
+    child.stderr.on("data", (data) => {
+      errorOutput += data.toString();
+    });
+    
+    if (input) {
+      child.stdin.write(input);
+      child.stdin.end();
+    }
+    
+    const timeoutId = setTimeout(() => {
+      child.kill("SIGKILL");
+      resolve({
+        output: output,
+        error: "Execution timeout (10 seconds)",
+        executionTime: Date.now() - startTime
+      });
+    }, timeout);
+    
+    child.on("close", (code) => {
+      clearTimeout(timeoutId);
+      fs.unlink(filePath).catch(() => {});
+      
+      resolve({
+        output: output,
+        error: errorOutput || (code !== 0 ? `Process exited with code ${code}` : ""),
+        executionTime: Date.now() - startTime
+      });
+    });
+  });
+}
+
+async function executeC(code: string, input: string, tempDir: string, executionId: string, timeout: number) {
+  const fileName = `${executionId}.c`;
+  const executableName = `${executionId}_exec`;
+  const filePath = path.join(tempDir, fileName);
+  const execPath = path.join(tempDir, executableName);
+  
+  await fs.writeFile(filePath, code);
+  
+  try {
+    // Compile the C code
+    await execAsync(`gcc "${filePath}" -o "${execPath}"`, { cwd: tempDir, timeout: 5000 });
+    
+    return new Promise((resolve) => {
+      const startTime = Date.now();
+      const child = spawn(execPath, [], {
+        cwd: tempDir,
+        stdio: ["pipe", "pipe", "pipe"]
+      });
+      
+      let output = "";
+      let errorOutput = "";
+      
+      child.stdout.on("data", (data) => {
+        output += data.toString();
+      });
+      
+      child.stderr.on("data", (data) => {
+        errorOutput += data.toString();
+      });
+      
+      if (input) {
+        child.stdin.write(input);
+        child.stdin.end();
+      }
+      
+      const timeoutId = setTimeout(() => {
+        child.kill("SIGKILL");
+        resolve({
+          output: output,
+          error: "Execution timeout (10 seconds)",
+          executionTime: Date.now() - startTime
+        });
+      }, timeout);
+      
+      child.on("close", (code) => {
+        clearTimeout(timeoutId);
+        // Clean up files
+        fs.unlink(filePath).catch(() => {});
+        fs.unlink(execPath).catch(() => {});
+        
+        resolve({
+          output: output,
+          error: errorOutput || (code !== 0 ? `Process exited with code ${code}` : ""),
+          executionTime: Date.now() - startTime
+        });
+      });
+    });
+  } catch (compileError) {
+    // Clean up source file
+    fs.unlink(filePath).catch(() => {});
+    return {
+      output: "",
+      error: `Compilation error: ${compileError}`,
+      executionTime: 0
+    };
+  }
+}
+
+async function executeCpp(code: string, input: string, tempDir: string, executionId: string, timeout: number) {
+  const fileName = `${executionId}.cpp`;
+  const executableName = `${executionId}_exec`;
+  const filePath = path.join(tempDir, fileName);
+  const execPath = path.join(tempDir, executableName);
+  
+  await fs.writeFile(filePath, code);
+  
+  try {
+    // Try to compile with g++ if available, fallback to gcc
+    let compileCommand = `g++ "${filePath}" -o "${execPath}"`;
+    try {
+      await execAsync(compileCommand, { cwd: tempDir, timeout: 5000 });
+    } catch {
+      // Fallback to gcc for C++ (basic support)
+      compileCommand = `gcc "${filePath}" -o "${execPath}" -lstdc++`;
+      await execAsync(compileCommand, { cwd: tempDir, timeout: 5000 });
+    }
+    
+    return new Promise((resolve) => {
+      const startTime = Date.now();
+      const child = spawn(execPath, [], {
+        cwd: tempDir,
+        stdio: ["pipe", "pipe", "pipe"]
+      });
+      
+      let output = "";
+      let errorOutput = "";
+      
+      child.stdout.on("data", (data) => {
+        output += data.toString();
+      });
+      
+      child.stderr.on("data", (data) => {
+        errorOutput += data.toString();
+      });
+      
+      if (input) {
+        child.stdin.write(input);
+        child.stdin.end();
+      }
+      
+      const timeoutId = setTimeout(() => {
+        child.kill("SIGKILL");
+        resolve({
+          output: output,
+          error: "Execution timeout (10 seconds)",
+          executionTime: Date.now() - startTime
+        });
+      }, timeout);
+      
+      child.on("close", (code) => {
+        clearTimeout(timeoutId);
+        fs.unlink(filePath).catch(() => {});
+        fs.unlink(execPath).catch(() => {});
+        
+        resolve({
+          output: output,
+          error: errorOutput || (code !== 0 ? `Process exited with code ${code}` : ""),
+          executionTime: Date.now() - startTime
+        });
+      });
+    });
+  } catch (compileError) {
+    fs.unlink(filePath).catch(() => {});
+    return {
+      output: "",
+      error: `Compilation error: ${compileError}`,
+      executionTime: 0
+    };
+  }
+}
+
+async function executeJava(code: string, input: string, tempDir: string, executionId: string, timeout: number) {
+  // Extract class name from code
+  const classMatch = code.match(/public\s+class\s+(\w+)/);
+  const className = classMatch ? classMatch[1] : `Main${executionId}`;
+  
+  const fileName = `${className}.java`;
+  const filePath = path.join(tempDir, fileName);
+  
+  // If no class found, wrap in a Main class
+  let finalCode = code;
+  if (!classMatch) {
+    finalCode = `public class Main${executionId} {\n${code}\n}`;
+  }
+  
+  await fs.writeFile(filePath, finalCode);
+  
+  try {
+    // Compile Java code
+    await execAsync(`javac "${filePath}"`, { cwd: tempDir, timeout: 5000 });
+    
+    return new Promise((resolve) => {
+      const startTime = Date.now();
+      const child = spawn("java", [className], {
+        cwd: tempDir,
+        stdio: ["pipe", "pipe", "pipe"]
+      });
+      
+      let output = "";
+      let errorOutput = "";
+      
+      child.stdout.on("data", (data) => {
+        output += data.toString();
+      });
+      
+      child.stderr.on("data", (data) => {
+        errorOutput += data.toString();
+      });
+      
+      if (input) {
+        child.stdin.write(input);
+        child.stdin.end();
+      }
+      
+      const timeoutId = setTimeout(() => {
+        child.kill("SIGKILL");
+        resolve({
+          output: output,
+          error: "Execution timeout (10 seconds)",
+          executionTime: Date.now() - startTime
+        });
+      }, timeout);
+      
+      child.on("close", (code) => {
+        clearTimeout(timeoutId);
+        // Clean up files
+        fs.unlink(filePath).catch(() => {});
+        fs.unlink(path.join(tempDir, `${className}.class`)).catch(() => {});
+        
+        resolve({
+          output: output,
+          error: errorOutput || (code !== 0 ? `Process exited with code ${code}` : ""),
+          executionTime: Date.now() - startTime
+        });
+      });
+    });
+  } catch (compileError) {
+    fs.unlink(filePath).catch(() => {});
+    return {
+      output: "",
+      error: `Compilation error: ${compileError}`,
+      executionTime: 0
+    };
+  }
+}
 
 // Configure multer for file uploads
 const upload = multer({
@@ -124,6 +503,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "Failed to delete document" });
+    }
+  });
+
+  // Code execution endpoint
+  app.post("/api/execute", async (req, res) => {
+    try {
+      const { code, language, input = "" } = req.body;
+      
+      if (!code || !language) {
+        return res.status(400).json({ error: "Code and language are required" });
+      }
+
+      const tempDir = "/tmp/code-exec";
+      await fs.mkdir(tempDir, { recursive: true });
+      
+      const executionId = Date.now().toString();
+      const result = await executeCode(code, language, input, tempDir, executionId);
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Code execution error:", error);
+      res.status(500).json({ 
+        error: "Failed to execute code", 
+        output: "", 
+        stderr: error instanceof Error ? error.message : "Unknown error" 
+      });
     }
   });
 
