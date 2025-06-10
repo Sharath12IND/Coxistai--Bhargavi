@@ -54,7 +54,7 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
   };
 
   const confirmLogout = () => {
-    // In real app, this would clear authentication and redirect to login
+    logout();
     setShowLogoutDialog(false);
     setLocation('/login');
   };
@@ -70,7 +70,7 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
 
   const getUserName = () => {
     if (!user) return 'Loading...';
-    return `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'User';
+    return `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'User';
   };
 
   const getPlanColor = () => {

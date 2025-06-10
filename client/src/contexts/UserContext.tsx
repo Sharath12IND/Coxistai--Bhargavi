@@ -95,20 +95,40 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
   // Load user from localStorage or use default
   useEffect(() => {
-    try {
-      const savedUser = localStorage.getItem('coexist-user-profile');
-      if (savedUser) {
-        setUser(JSON.parse(savedUser));
+    const checkAuth = () => {
+      const authState = localStorage.getItem('coexist-auth-state');
+      const isAuthenticated = authState === 'authenticated';
+      
+      if (isAuthenticated) {
+        try {
+          const savedUser = localStorage.getItem('coexist-user-profile');
+          if (savedUser) {
+            setUser(JSON.parse(savedUser));
+          } else {
+            setUser(defaultUser);
+            localStorage.setItem('coexist-user-profile', JSON.stringify(defaultUser));
+          }
+        } catch (err) {
+          console.error('Failed to load user profile from localStorage:', err);
+          setUser(defaultUser);
+        }
       } else {
-        setUser(defaultUser);
-        localStorage.setItem('coexist-user-profile', JSON.stringify(defaultUser));
+        setUser(null);
       }
-    } catch (err) {
-      console.error('Failed to load user profile from localStorage:', err);
-      setUser(defaultUser);
-    } finally {
       setIsLoading(false);
-    }
+    };
+
+    checkAuth();
+
+    // Listen for auth state changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'coexist-auth-state') {
+        checkAuth();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   const updateProfile = async (profileData: UpdateUserProfile) => {

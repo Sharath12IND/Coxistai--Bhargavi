@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import GlassmorphismButton from "@/components/ui/glassmorphism-button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const [, setLocation] = useLocation();
@@ -16,6 +17,7 @@ const Login = () => {
     username: "",
     password: ""
   });
+  const { login } = useAuth();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -26,12 +28,12 @@ const Login = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Redirect to home page (no backend authentication)
+    login();
     setLocation("/");
   };
 
   const handleSocialLogin = (provider: string) => {
-    // Redirect to home page (no backend authentication)
+    login();
     setLocation("/");
   };
 
