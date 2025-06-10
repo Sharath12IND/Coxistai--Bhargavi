@@ -18,6 +18,7 @@ import Team from "@/pages/Team";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import ForgotPassword from "@/pages/ForgotPassword";
+import LoadingDemo from "@/pages/LoadingDemo";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/signup" component={Signup} />
       <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/demo" component={LoadingDemo} />
       <Route component={NotFound} />
     </Switch>
   );

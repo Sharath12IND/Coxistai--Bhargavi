@@ -254,6 +254,7 @@ const SparkTutorChat = () => {
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
     setMessages(prev => [...prev, aiResponse]);
+    setIsAITyping(false);
   };
 
   const handleFilesChange = (files: UploadedFile[]) => {
@@ -494,6 +495,29 @@ const SparkTutorChat = () => {
                   )}
                 </motion.div>
               ))}
+              
+              {/* AI Typing Indicator */}
+              {isAITyping && (
+                <motion.div
+                  className="flex items-start space-x-3"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                >
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="max-w-lg p-3 rounded-lg glassmorphism rounded-tl-none">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-2">SparkTutor is typing...</p>
+                  </div>
+                </motion.div>
+              )}
+              
               <div ref={messagesEndRef} />
             </div>
             
