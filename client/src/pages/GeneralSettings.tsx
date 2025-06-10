@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Settings, Globe, Palette, Clock, Keyboard, Accessibility, Monitor, Download } from "lucide-react";
+import { Settings, Globe, Clock, Keyboard, Accessibility, Monitor, Download } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -10,12 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
-import { useTheme } from "@/contexts/ThemeContext";
 
 interface GeneralSettings {
   language: string;
   timezone: string;
-  theme: string;
   fontSize: number;
   autoSave: boolean;
   keyboardShortcuts: boolean;
@@ -29,13 +27,11 @@ interface GeneralSettings {
 
 export default function GeneralSettings() {
   const { user, updateProfile } = useUser();
-  const { theme, setTheme } = useTheme();
   const { toast } = useToast();
   
   const [settings, setSettings] = useState<GeneralSettings>({
     language: user?.language ?? 'en',
     timezone: user?.timezone ?? 'America/Los_Angeles',
-    theme: user?.theme ?? 'dark',
     fontSize: 16,
     autoSave: true,
     keyboardShortcuts: true,
@@ -56,11 +52,7 @@ export default function GeneralSettings() {
       await updateProfile({
         language: settings.language,
         timezone: settings.timezone,
-        theme: settings.theme as 'light' | 'dark'
       });
-      
-      // Update theme context
-      setTheme(settings.theme as 'light' | 'dark');
       
       toast({
         title: "Settings saved",
@@ -120,44 +112,6 @@ export default function GeneralSettings() {
           description: 'Select your timezone for accurate scheduling',
           type: 'select',
           options: timezones
-        }
-      ]
-    },
-    {
-      title: "Appearance",
-      icon: Palette,
-      description: "Customize the look and feel",
-      settings: [
-        {
-          key: 'theme',
-          label: 'Theme',
-          description: 'Choose between light and dark theme',
-          type: 'select',
-          options: [
-            { value: 'light', label: 'Light' },
-            { value: 'dark', label: 'Dark' },
-          ]
-        },
-        {
-          key: 'fontSize',
-          label: 'Font size',
-          description: 'Adjust text size for better readability',
-          type: 'slider',
-          min: 12,
-          max: 24,
-          step: 1
-        },
-        {
-          key: 'compactMode',
-          label: 'Compact mode',
-          description: 'Reduce spacing for more content',
-          type: 'toggle'
-        },
-        {
-          key: 'animations',
-          label: 'Animations',
-          description: 'Enable smooth transitions and effects',
-          type: 'toggle'
         }
       ]
     },
