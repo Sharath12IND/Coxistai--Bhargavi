@@ -1,10 +1,51 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
-import type { User, UpdateUserProfile } from '@shared/schema';
+
+// Local user type without database dependencies
+interface LocalUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  bio?: string;
+  location?: string;
+  timezone?: string;
+  avatar?: string | null;
+  dateOfBirth?: string;
+  occupation?: string;
+  company?: string;
+  theme: string;
+  emailNotifications: boolean;
+  pushNotifications: boolean;
+  marketingEmails: boolean;
+  weeklyDigest: boolean;
+  language: string;
+  publicProfile: boolean;
+}
+
+interface UpdateUserProfile {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  bio?: string;
+  location?: string;
+  timezone?: string;
+  avatar?: string | null;
+  dateOfBirth?: string;
+  occupation?: string;
+  company?: string;
+  theme?: string;
+  emailNotifications?: boolean;
+  pushNotifications?: boolean;
+  marketingEmails?: boolean;
+  weeklyDigest?: boolean;
+  language?: string;
+  publicProfile?: boolean;
+}
 
 interface UserContextType {
-  user: User | null;
+  user: LocalUser | null;
   updateProfile: (profileData: UpdateUserProfile) => Promise<void>;
   isLoading: boolean;
   error: string | null;
@@ -24,78 +65,69 @@ interface UserProviderProps {
   children: ReactNode;
 }
 
+// Default user profile
+const defaultUser: LocalUser = {
+  id: 1,
+  firstName: 'Alex',
+  lastName: 'Johnson',
+  email: 'alex.johnson@email.com',
+  phone: '+1 (555) 123-4567',
+  bio: 'AI enthusiast and lifelong learner passionate about technology and education.',
+  location: 'San Francisco, CA',
+  timezone: 'America/Los_Angeles',
+  avatar: null,
+  dateOfBirth: '1995-06-15',
+  occupation: 'Software Engineer',
+  company: 'Tech Innovations Inc.',
+  theme: 'dark',
+  emailNotifications: true,
+  pushNotifications: true,
+  marketingEmails: false,
+  weeklyDigest: true,
+  language: 'en',
+  publicProfile: false,
+};
+
 export const UserProvider = ({ children }: UserProviderProps) => {
+  const [user, setUser] = useState<LocalUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const queryClient = useQueryClient();
-  
-  // Mock user ID for demo purposes - in a real app this would come from authentication
-  const currentUserId = 1;
 
-  const { data: user, isLoading } = useQuery({
-    queryKey: ['/api/users', currentUserId],
-    queryFn: async () => {
-      try {
-        const response = await fetch(`/api/users/${currentUserId}`);
-        if (!response.ok) {
-          // If user doesn't exist, create a default user
-          if (response.status === 404) {
-            const defaultUser = {
-              firstName: 'Alex',
-              lastName: 'Johnson',
-              email: 'alex.johnson@email.com',
-              phone: '+1 (555) 123-4567',
-              bio: 'AI enthusiast and lifelong learner passionate about technology and education.',
-              location: 'San Francisco, CA',
-              timezone: 'America/Los_Angeles',
-              avatar: null,
-              dateOfBirth: '1995-06-15',
-              occupation: 'Software Engineer',
-              company: 'Tech Innovations Inc.',
-              theme: 'dark',
-              emailNotifications: true,
-              pushNotifications: true,
-              marketingEmails: false,
-              weeklyDigest: true,
-              language: 'en',
-              publicProfile: false,
-            };
-            
-            const updateResponse = await apiRequest('PUT', `/api/users/${currentUserId}/profile`, defaultUser);
-            
-            return updateResponse.json();
-          }
-          throw new Error('Failed to fetch user profile');
-        }
-        return response.json();
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load user profile');
-        return null;
+  // Load user from localStorage or use default
+  useEffect(() => {
+    try {
+      const savedUser = localStorage.getItem('coexist-user-profile');
+      if (savedUser) {
+        setUser(JSON.parse(savedUser));
+      } else {
+        setUser(defaultUser);
+        localStorage.setItem('coexist-user-profile', JSON.stringify(defaultUser));
       }
-    },
-    retry: 1,
-  });
-
-  const updateProfileMutation = useMutation({
-    mutationFn: async (profileData: UpdateUserProfile) => {
-      const response = await apiRequest('PUT', `/api/users/${currentUserId}/profile`, profileData);
-      return response.json();
-    },
-    onSuccess: (updatedUser) => {
-      queryClient.setQueryData(['/api/users', currentUserId], updatedUser);
-      setError(null);
-    },
-    onError: (err) => {
-      setError(err instanceof Error ? err.message : 'Failed to update profile');
-    },
-  });
+    } catch (err) {
+      console.error('Failed to load user profile from localStorage:', err);
+      setUser(defaultUser);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const updateProfile = async (profileData: UpdateUserProfile) => {
-    await updateProfileMutation.mutateAsync(profileData);
+    try {
+      if (!user) return;
+      
+      const updatedUser = { ...user, ...profileData };
+      setUser(updatedUser);
+      localStorage.setItem('coexist-user-profile', JSON.stringify(updatedUser));
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update profile');
+      throw err;
+    }
   };
 
   return (
     <UserContext.Provider value={{
-      user: user || null,
+      user,
       updateProfile,
       isLoading,
       error,

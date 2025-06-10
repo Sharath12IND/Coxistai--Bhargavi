@@ -22,7 +22,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useLoading } from "@/contexts/LoadingContext";
 import { useUser } from "@/contexts/UserContext";
-import UserInfoDisplay from "@/components/ui/user-info-display";
 
 export default function ProfileSettings() {
   const { toast } = useToast();
@@ -63,7 +62,7 @@ export default function ProfileSettings() {
         bio: user.bio || "",
         location: user.location || "",
         timezone: user.timezone || "",
-        avatar: user.avatar,
+        avatar: user.avatar ?? null,
         dateOfBirth: user.dateOfBirth || "",
         occupation: user.occupation || "",
         company: user.company || "",
@@ -143,8 +142,6 @@ export default function ProfileSettings() {
           </h1>
           <p className="text-slate-400">Manage your account information and preferences</p>
         </motion.div>
-
-        <UserInfoDisplay />
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Profile Picture Section */}
