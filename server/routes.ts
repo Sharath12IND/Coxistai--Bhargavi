@@ -517,9 +517,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const defaultUser = {
           username: `user${id}`,
           password: 'default123',
-          firstName: 'Alex',
-          lastName: 'Johnson',
-          email: 'alex.johnson@email.com',
+          firstName: 'Sharath',
+          lastName: 'Bandaari',
+          email: 'sharath.bandaari@email.com',
           phone: '+1 (555) 123-4567',
           bio: 'AI enthusiast and lifelong learner passionate about technology and education.',
           location: 'San Francisco, CA',
