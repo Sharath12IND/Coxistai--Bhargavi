@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Navigation from "@/components/layout/Navigation";
 import AnimatedBackground from "@/components/layout/AnimatedBackground";
+import Footer from "@/components/layout/Footer";
 import { LoadingProvider } from "@/contexts/LoadingContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { UserProvider } from "@/contexts/UserContext";
@@ -63,10 +64,13 @@ function App() {
           <UserProvider>
             <TooltipProvider>
               <LoadingProvider>
-                <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden">
+                <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden flex flex-col">
                   <AnimatedBackground />
                   <Navigation />
-                  <Router />
+                  <div className="flex-1">
+                    <Router />
+                  </div>
+                  <Footer />
                   <Toaster />
                 </div>
               </LoadingProvider>
