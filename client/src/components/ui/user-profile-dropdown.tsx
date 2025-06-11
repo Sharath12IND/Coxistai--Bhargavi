@@ -115,7 +115,7 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
             
             {/* Dropdown */}
             <motion.div
-              className="absolute top-full right-0 mt-2 w-80 glassmorphism-strong rounded-xl border border-white/10 shadow-2xl overflow-hidden z-50"
+              className="absolute top-full right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] glassmorphism-strong rounded-xl border border-white/10 shadow-2xl overflow-hidden z-50 sm:w-80 sm:right-0 -right-4"
               initial={{ opacity: 0, y: -10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
