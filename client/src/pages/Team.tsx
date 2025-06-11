@@ -76,7 +76,7 @@ const Team = () => {
 
         {/* Team Grid */}
         <motion.div 
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+          className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
@@ -84,47 +84,48 @@ const Team = () => {
           {TEAM_DATA.map((member, index) => (
             <motion.div
               key={member.id}
-              className="glassmorphism rounded-2xl p-8 hover:scale-105 transition-all duration-300 group"
+              className="glassmorphism rounded-3xl p-6 lg:p-8 hover:scale-105 transition-all duration-300 group relative overflow-hidden border border-slate-700/50 hover:border-blue-400/30"
               variants={itemVariants}
-              whileHover={{ y: -5 }}
+              whileHover={{ y: -8 }}
             >
+              {/* Background decoration */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               {/* Profile Image */}
               <div className="relative mb-6">
-                <div className={`w-24 h-24 mx-auto bg-gradient-to-r ${member.gradient} rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg`}>
+                <div className={`w-28 h-28 mx-auto bg-gradient-to-r ${member.gradient} rounded-3xl flex items-center justify-center text-white font-bold text-3xl shadow-xl transform transition-transform hover:scale-105`}>
                   {member.image}
                 </div>
-                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-[#21223a] flex items-center justify-center">
-                  <div className="w-3 h-3 bg-white rounded-full"></div>
-                </div>
+                {/* Subtle glow effect */}
+                <div className={`absolute inset-0 w-28 h-28 mx-auto bg-gradient-to-r ${member.gradient} rounded-3xl opacity-20 blur-lg -z-10`}></div>
               </div>
 
               {/* Member Info */}
               <div className="text-center mb-6">
-                <h3 className="text-xl font-bold text-white mb-2">{member.name}</h3>
-                <div className="text-blue-400 font-semibold mb-1">{member.role}</div>
-                <div className="text-sm text-slate-400 mb-4">{member.designation}</div>
-                <p className="text-slate-300 text-sm leading-relaxed">{member.bio}</p>
+                <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-blue-300 transition-colors">{member.name}</h3>
+                <div className="inline-block bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 py-1 rounded-full text-sm font-semibold mb-2">{member.role}</div>
+                <div className="text-sm text-slate-400 mb-4 font-medium">{member.designation}</div>
+                <p className="text-slate-300 text-sm leading-relaxed px-2">{member.bio}</p>
               </div>
 
               {/* Contact Links */}
-              <div className="flex justify-center space-x-4">
+              <div className="flex justify-center space-x-6">
                 <motion.a
                   href={member.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 glassmorphism rounded-lg flex items-center justify-center hover:bg-blue-500/20 transition-colors"
-                  whileHover={{ scale: 1.1 }}
+                  className="w-12 h-12 glassmorphism rounded-xl flex items-center justify-center hover:bg-blue-500/30 transition-all duration-300 group/link"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
                   whileTap={{ scale: 0.9 }}
                 >
-                  <Linkedin className="w-5 h-5 text-blue-400" />
+                  <Linkedin className="w-6 h-6 text-blue-400 group-hover/link:text-blue-300" />
                 </motion.a>
                 <motion.a
                   href={`mailto:${member.email}`}
-                  className="w-10 h-10 glassmorphism rounded-lg flex items-center justify-center hover:bg-green-500/20 transition-colors"
-                  whileHover={{ scale: 1.1 }}
+                  className="w-12 h-12 glassmorphism rounded-xl flex items-center justify-center hover:bg-green-500/30 transition-all duration-300 group/link"
+                  whileHover={{ scale: 1.1, rotate: -5 }}
                   whileTap={{ scale: 0.9 }}
                 >
-                  <Mail className="w-5 h-5 text-green-400" />
+                  <Mail className="w-6 h-6 text-green-400 group-hover/link:text-green-300" />
                 </motion.a>
               </div>
             </motion.div>

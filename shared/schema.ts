@@ -18,6 +18,7 @@ export const users = pgTable("users", {
   dateOfBirth: text("date_of_birth"),
   occupation: text("occupation"),
   company: text("company"),
+  theme: text("theme").default("dark"),
   emailNotifications: boolean("email_notifications").default(true),
   pushNotifications: boolean("push_notifications").default(true),
   marketingEmails: boolean("marketing_emails").default(false),
