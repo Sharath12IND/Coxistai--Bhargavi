@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import { 
@@ -27,8 +27,19 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
   const [, setLocation] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const { user, updateProfile } = useUser();
   const { logout } = useAuth();
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -84,8 +95,16 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
   return (
     <div className={`relative ${className}`}>
       <motion.button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-3 p-2 rounded-xl glassmorphism hover:bg-white/10 transition-all duration-200"
+        onClick={() => {
+          if (isMobile) {
+            navigateTo('/profile');
+          } else if (className.includes('w-full')) {
+            setIsOpen(!isOpen);
+          } else {
+            setIsOpen(!isOpen);
+          }
+        }}
+        className="flex items-center space-x-3 p-2 rounded-xl glassmorphism hover:bg-white/10 transition-all duration-200 w-full"
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
@@ -95,17 +114,27 @@ export default function UserProfileDropdown({ className = "" }: UserProfileDropd
             {getInitials(user.firstName || '', user.lastName || '')}
           </AvatarFallback>
         </Avatar>
-        <div className="hidden sm:block text-left">
-          <div className="text-sm font-medium text-white">{getUserName()}</div>
-          <div className="text-xs text-slate-400">Pro Plan</div>
+        <div className="text-left flex-1">
+          <div className="text-sm font-medium text-white sm:block hidden">{getUserName()}</div>
+          <div className="text-sm font-medium text-white sm:hidden block">Profile</div>
+          <div className="text-xs text-slate-400 sm:block hidden">Pro Plan</div>
+          <div className="text-xs text-slate-400 sm:hidden block">Settings & Account</div>
         </div>
-        <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
-          isOpen ? 'rotate-180' : ''
-        }`} />
+        {!isMobile && className.includes('w-full') ? (
+          <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+            isOpen ? 'rotate-180' : ''
+          }`} />
+        ) : isMobile ? (
+          <div className="text-xs text-slate-400">→</div>
+        ) : (
+          <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+            isOpen ? 'rotate-180' : ''
+          }`} />
+        )}
       </motion.button>
 
       <AnimatePresence>
-        {isOpen && (
+        {isOpen && !isMobile && (
           <>
             {/* Backdrop */}
             <div 
