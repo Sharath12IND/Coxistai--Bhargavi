@@ -223,21 +223,21 @@ const Home = () => {
           </motion.div>
         </div>
 
-        {/* Floating Elements */}
+        {/* Floating Elements - Hidden on mobile */}
         <motion.div 
-          className="absolute top-1/4 left-10 w-20 h-20 glassmorphism rounded-full flex items-center justify-center"
+          className="hidden lg:flex absolute top-1/4 left-10 w-12 h-12 xl:w-16 xl:h-16 glassmorphism rounded-full items-center justify-center"
           animate={{ y: [0, -10, 0] }}
           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         >
-          <NotebookPen className="w-8 h-8 text-blue-400" />
+          <NotebookPen className="w-5 h-5 xl:w-6 xl:h-6 text-blue-400" />
         </motion.div>
         
         <motion.div 
-          className="absolute top-1/3 right-10 w-16 h-16 glassmorphism rounded-full flex items-center justify-center"
+          className="hidden lg:flex absolute top-1/3 right-10 w-10 h-10 xl:w-12 xl:h-12 glassmorphism rounded-full items-center justify-center"
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
         >
-          <GraduationCap className="w-6 h-6 text-green-400" />
+          <GraduationCap className="w-4 h-4 xl:w-5 xl:h-5 text-green-400" />
         </motion.div>
       </section>
 
