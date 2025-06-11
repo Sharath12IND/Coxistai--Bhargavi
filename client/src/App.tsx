@@ -28,6 +28,7 @@ import BillingSubscription from "@/pages/BillingSubscription";
 import NotificationSettings from "@/pages/NotificationSettings";
 import PrivacySettings from "@/pages/PrivacySettings";
 import GeneralSettings from "@/pages/GeneralSettings";
+import Support from "@/pages/Support";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -50,6 +51,7 @@ function Router() {
       <Route path="/notifications" component={NotificationSettings} />
       <Route path="/privacy" component={PrivacySettings} />
       <Route path="/settings" component={GeneralSettings} />
+      <Route path="/support" component={Support} />
       <Route path="/demo" component={LoadingDemo} />
       <Route component={NotFound} />
     </Switch>
